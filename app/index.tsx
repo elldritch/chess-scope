@@ -4,6 +4,7 @@ import { AppContainer } from 'react-hot-loader';
 
 import { TacScope } from './TacScope';
 
+// Set up hot reloading.
 const render = (App: React.ComponentClass) => {
   ReactDOM.render(
     <AppContainer>

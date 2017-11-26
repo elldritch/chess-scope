@@ -5,16 +5,14 @@ html(lang='en')
     meta(http-equiv='x-ua-compatible' content='ie=edge')
     title TacScope
     meta(name='viewport' content='width=device-width initial-scale=1')
-    //- link(rel='stylesheet'
-    //-      href='https://unpkg.com/basscss@8.0.2/css/basscss.min.css')
-    //- link(rel='stylesheet'
-    //-      href='https://unpkg.com/basscss-colors@2.2.0/css/colors.css')
-    //- link(rel='stylesheet'
-    //-      href='https://unpkg.com/basscss-border-colors@2.1.0/css/border-colors.css')
-    //- link(rel='stylesheet'
-    //-      href='https://fonts.googleapis.com/css?family=Roboto+Mono:400,700')
-    //- link(rel='stylesheet' href='/styles.css')
-    //- link(rel='shortcut icon' href='/favicon.ico')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css')
+    link(rel='stylesheet' href='https://unpkg.com/normalize.css@^4.1.1')
+    link(rel='stylesheet' href='https://unpkg.com/@blueprintjs/core@^1.11.0/dist/blueprint.css')
+    link(rel='stylesheet' href='https://unpkg.com/oakmac-chessboard@^1.0.0/src/chessboard.css')
   body
     #app
+    //- `oakmac-chessboard` is not configured to work well with module loaders
+    script(src='//unpkg.com/jquery@^1.8.3')
+    script(src='//unpkg.com/oakmac-chessboard@^1.0.0')
+
     script(src='//localhost:8081/index.js')

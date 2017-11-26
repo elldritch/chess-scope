@@ -2,21 +2,31 @@
   "name": "chess-tacscope",
   "private": true,
   "scripts": {
-    "build": "npm run clean && mkdir dist tmp && npm run build:html && npm run build:js && find dist -empty -type d -delete",
+    "build": "npm run clean && mkdir dist tmp && npm run build:html && npm run build:js && npm run build:assets",
+    "build:assets": "cp -r assets dist/app",
     "build:html": "pug --out dist/app app && find dist -name _*.html -delete",
-    "build:js": "tsc --outdir tmp && npm run build:js:app && npm run build:js:server",
+    "build:js": "(tsc --outdir tmp || true) && npm run build:js:app && npm run build:js:server",
     "build:js:app": "mkdir -p dist/app && browserify tmp/app/index.js -o dist/app/index.js -t babelify",
     "build:js:server": "rsync -a tmp/* dist --exclude app",
     "clean": "rm -rf dist tmp",
     "start": "node dist/server.js",
-    "dev": "nodemon --ext ts,js,json,pug --ignore dist/ --ignore tmp/ --exec 'npm run build && npm start'"
+    "dev": "nodemon --ext ts,js,json,pug --ignore dist/ --ignore tmp/ --exec 'npm run build && npm start || true'"
   },
   "dependencies": {
+    "@blueprintjs/core": "^1.33.0",
+    "@types/jquery": "^3.2.16",
     "express": "^4.16.2",
+    "glamor": "^2.20.40",
+    "glamorous": "^4.11.0",
     "http-proxy": "^1.16.2",
-    "oakmac-chessboard": "^1.0.0",
+    "prop-types": "^15.6.0",
     "react": "^16.1.1",
-    "react-dom": "^16.1.1"
+    "react-addons-css-transition-group": "^15.6.2",
+    "react-dom": "^16.1.1",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
+    "react-router-redux": "^4.0.8",
+    "redux": "^3.7.2"
   },
   "devDependencies": {
     "@types/express": "^4.0.39",

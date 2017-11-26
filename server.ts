@@ -30,7 +30,8 @@ const wsProxy = createProxyServer({
 const app = express();
 
 app.use('/api', (req, res) => httpProxy.web(req, res));
-app.use(express.static(path.join(__dirname, 'app')));
+app.use('/assets', express.static(path.join(__dirname, 'app', 'assets')))
+app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'app', 'index.html')));
 
 // Listen.
 console.log(`Listening on ${TACSCOPE_HOST}:${TACSCOPE_PORT}`);

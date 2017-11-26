@@ -21,7 +21,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ['react-hot-loader/webpack', 'babel-loader', 'ts-loader'],
+        use: ['react-hot-loader/webpack', 'babel-loader', { loader: 'ts-loader', options: { transpileOnly: true } }],
         include: [path.join(__dirname, 'app')],
       },
     ],
