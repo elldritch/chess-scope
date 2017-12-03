@@ -17,7 +17,20 @@ if (isNaN(TACSCOPE_PORT)) {
 const httpProxy = createProxyServer({
   target: 'https://lichess.org',
   changeOrigin: true,
-  cookieDomainRewrite: TACSCOPE_HOST,
+  cookieDomainRewrite: '',
+});
+
+httpProxy.on('proxyReq', (proxyReq, req, res) => {
+  // Strip `Origin: ` header, otherwise lichess.org returns 403 Forbidden ("Cross origin request forbidden.").
+  proxyReq.removeHeader('origin');
+});
+
+httpProxy.on('proxyRes', (proxyRes, req, res) => {
+  // Strip `Secure; ` from `set-cookie` header so cookie works over HTTP (i.e. localhost).
+  const setCookies = proxyRes.headers['set-cookie'];
+  if (setCookies) {
+    proxyRes.headers['set-cookie'] = setCookies.map(cookie => cookie.replace('Secure; ', ''));
+  }
 });
 
 const wsProxy = createProxyServer({
@@ -30,7 +43,7 @@ const wsProxy = createProxyServer({
 const app = express();
 
 app.use('/api', (req, res) => httpProxy.web(req, res));
-app.use('/assets', express.static(path.join(__dirname, 'app', 'assets')))
+app.use('/assets', express.static(path.join(__dirname, 'app', 'assets')));
 app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'app', 'index.html')));
 
 // Listen.
