@@ -1,9 +1,10 @@
+import { Action } from 'redux';
 import { Observable } from 'rxjs';
-import { ActionsObservable, combineEpics } from 'redux-observable';
 
 import * as qs from 'qs';
 
-import { Async, Error, NetworkError, networkError } from '../types';
+import { Async, Error, NetworkError, networkError } from './util/types';
+import { fetch } from './util/rpc';
 
 // Models.
 type GameRating = {
@@ -14,16 +15,25 @@ type GameRating = {
   rd: number;
 };
 
-export type Game = {
-  id: string;
-  variant: string;
-  speed: string;
-  perf: string;
-  rated: boolean;
+export type NowPlayingGame = {
+  color: 'white' | 'black';
+  fen: string;
+  fullId: string;
+  gameId: string;
+  isMyTurn: boolean;
+  lastMove: string;
   opponent: {
     id: string;
     username: string;
     rating: number;
+  };
+  perf: string;
+  rated: boolean;
+  secondsLeft: number | null;
+  speed: string;
+  variant: {
+    key: string;
+    name: string;
   };
 };
 
@@ -38,7 +48,7 @@ export type User = {
     lastName: string;
     location: string;
   }>;
-  nowPlaying: Game[];
+  nowPlaying: NowPlayingGame[];
   online: boolean;
   perfs: {
     blitz: GameRating;
@@ -55,26 +65,33 @@ export type User = {
   username: string;
 };
 
+export type UserState = Readonly<Async<User | null, LoginError | NotLoggedInError | NetworkError>>;
+
+// Errors.
+export type NotLoggedInError = Error<'AUTHENTICATION_REQUIRED', 'Must be logged in to do this.'>;
+
+export function notLoggedInError(details: {}): NotLoggedInError {
+  return { error: 'AUTHENTICATION_REQUIRED', reason: 'Must be logged in to do this.', details };
+}
+
+export type LoginError = Error<'AUTHENTICATION_FAILED', 'Incorrect username or password.'>;
+
+export function loginError(details: {}): LoginError {
+  return { error: 'AUTHENTICATION_FAILED', reason: 'Incorrect username or password.', details };
+}
+
 // Actions.
 export type LoadUser = { type: 'LOAD_USER' };
 type LoadUserSucceeded = { type: 'LOAD_USER_SUCCEEDED'; user: User };
 type LoadUserFailed = { type: 'LOAD_USER_FAILED'; error: NotLoggedInError | NetworkError };
-type NotLoggedInError = Error<'AUTHENTICATION_REQUIRED', 'Must be logged in to do this.'>;
-function notLoggedInError(details: {}): NotLoggedInError {
-  return { error: 'AUTHENTICATION_REQUIRED', reason: 'Must be logged in to do this.', details };
-}
 
 export type Login = { type: 'LOG_IN'; username: string; password: string };
 type LoginSucceeded = { type: 'LOG_IN_SUCCEEDED'; user: User };
 type LoginFailed = { type: 'LOG_IN_FAILED'; error: LoginError | NetworkError };
-type LoginError = Error<'AUTHENTICATION_FAILED', 'Incorrect username or password.'>;
-function loginError(details: {}): LoginError {
-  return { error: 'AUTHENTICATION_FAILED', reason: 'Incorrect username or password.', details };
-}
 
 export type Logout = { type: 'LOG_OUT' };
 type LogoutSucceeded = { type: 'LOG_OUT_SUCCEEDED' };
-type LogoutFailed = { type: 'LOG_OUT_FAILED', error: NetworkError };
+type LogoutFailed = { type: 'LOG_OUT_FAILED'; error: NetworkError };
 
 export type UserAction =
   | LoadUser
@@ -124,8 +141,6 @@ function logoutFailed(error: NetworkError): LogoutFailed {
 }
 
 // Reducer.
-export type UserState = Readonly<Async<User | null, LoginError | NotLoggedInError | NetworkError>>;
-
 export function userReducer(state: UserState | undefined, action: UserAction): UserState {
   if (!state) {
     return { loading: false, data: null, error: null };
@@ -159,96 +174,50 @@ export function userReducer(state: UserState | undefined, action: UserAction): U
 }
 
 // Effects.
-const loadUserEpic = (action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> =>
-  action$.switchMap(action =>
-    Observable.from(
-      window
-        .fetch('/api/account/info', {
-          method: 'GET',
-          credentials: 'same-origin',
-          headers: [['Accept', 'application/vnd.lichess.v1+json']],
-        })
-        .catch(err => {
-          throw networkError(err);
-        })
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          } else if (res.status === 401) {
-            throw notLoggedInError(res);
-          } else {
-            throw networkError(res);
-          }
-        }),
-    )
-      .map(loadUserSucceeded)
-      .catch(err => Observable.of(loadUserFailed(err))),
+export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> {
+  return fetch(
+    '/api/account/info',
+    action => ({}),
+    res => {
+      if (res.status === 401) {
+        throw notLoggedInError(res);
+      }
+    },
+    loadUserSucceeded,
+    loadUserFailed,
+    action$,
   );
+}
 
-const loginEpic = (action$: Observable<Login>): Observable<LoginSucceeded | LoginFailed> =>
-  action$.switchMap(action =>
-    Observable.from(
-      window
-        .fetch('/api/login', {
-          method: 'POST',
-          credentials: 'same-origin',
-          body: qs.stringify({
-            username: action.username,
-            password: action.password,
-          }),
-          headers: [
-            ['Accept', 'application/vnd.lichess.v1+json'],
-            ['Content-Type', 'application/x-www-form-urlencoded'],
-          ],
-        })
-        .catch(err => {
-          throw networkError(err);
-        })
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          } else if (res.status === 401) {
-            throw loginError(res);
-          } else {
-            throw networkError(res);
-          }
-        }),
-    )
-      .map(loginSucceeded)
-      .catch(err => Observable.of(loginFailed(err))),
+export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded | LoginFailed> {
+  return fetch(
+    '/api/login',
+    action => ({
+      method: 'POST',
+      body: {
+        username: action.username,
+        password: action.password,
+      },
+    }),
+    res => {
+      if (res.status === 401) {
+        throw loginError(res);
+      }
+    },
+    loginSucceeded,
+    loginFailed,
+    action$,
   );
+}
 
-const logoutEpic = (action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> =>
-  action$.switchMap(action =>
-    Observable.from(
-      window
-        .fetch('/api/logout', {
-          method: 'GET',
-          credentials: 'same-origin',
-          headers: [
-            ['Accept', 'application/vnd.lichess.v1+json'],
-            ['Content-Type', 'application/x-www-form-urlencoded'],
-          ],
-        })
-        .catch(err => {
-          throw networkError(err);
-        })
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw networkError(res);
-          }
-        }),
-    )
-      .map(logoutSucceeded)
-      .catch(err => Observable.of(logoutFailed(err))),
-  );
+export function logoutEpic(action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> {
+  return fetch('/api/logout', action => ({}), res => {}, logoutSucceeded, logoutFailed, action$);
+}
 
-export function userEpic(action$: Observable<UserAction>): Observable<UserAction> {
+export function userEpic(action$: Observable<Action>): Observable<Action> {
   return Observable.merge(
-    loadUserEpic(action$.filter((action: UserAction): action is LoadUser => action.type === 'LOAD_USER')),
-    loginEpic(action$.filter((action: UserAction): action is Login => action.type === 'LOG_IN')),
-    logoutEpic(action$.filter((action: UserAction): action is Logout => action.type === 'LOG_OUT')),
+    loadUserEpic(action$.filter((action: Action): action is LoadUser => action.type === 'LOAD_USER')),
+    loginEpic(action$.filter((action: Action): action is Login => action.type === 'LOG_IN')),
+    logoutEpic(action$.filter((action: Action): action is Logout => action.type === 'LOG_OUT')),
   );
 }

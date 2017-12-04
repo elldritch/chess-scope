@@ -46,7 +46,7 @@ class TacScope extends React.Component<TacScopeProps, {}> {
                     <div>
                       <h1 className="title" style={{ marginBottom: '1.5rem' }}>
                         <Link to="/" style={{ color: 'inherit' }}>
-                          TacScope
+                          ChessScope
                         </Link>
                       </h1>
                       <h2 className="subtitle">Radar for Chess</h2>
@@ -98,7 +98,7 @@ class TacScope extends React.Component<TacScopeProps, {}> {
             </div>
           </div>
         </section>
-        <section className="section">
+        <section className="section" style={{ paddingTop: 0 }}>
           <div className="container">{routes}</div>
         </section>
         {/* <section className="section">
