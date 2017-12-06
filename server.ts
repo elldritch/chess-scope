@@ -13,7 +13,7 @@ if (isNaN(TACSCOPE_PORT)) {
   process.exit(1);
 }
 
-// Set up proxy servers.
+// Set up HTTP proxy.
 const httpProxy = createProxyServer({
   target: 'https://lichess.org',
   changeOrigin: true,
@@ -33,10 +33,15 @@ httpProxy.on('proxyRes', (proxyRes, req, res) => {
   }
 });
 
+// Set up WebSocket proxy.
 const wsProxy = createProxyServer({
   target: 'wss://socket.lichess.org',
   changeOrigin: true,
   ws: true,
+});
+
+wsProxy.on('proxyReqWs', (proxyReq, req, res) => {
+  proxyReq.removeHeader('origin');
 });
 
 // Set up routing stack.
@@ -50,4 +55,6 @@ app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'app', 'index.html
 console.log(`Listening on ${TACSCOPE_HOST}:${TACSCOPE_PORT}`);
 
 const server = app.listen(TACSCOPE_PORT);
-server.on('upgrade', (req, socket, head) => wsProxy.ws(req, socket, head));
+server.on('upgrade', (req, socket, head) => {
+  wsProxy.ws(req, socket, head);
+});

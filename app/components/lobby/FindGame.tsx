@@ -16,12 +16,16 @@ class FindGame extends React.Component {
           </div>
           <div>
             <h2 className="title is-4">Your Games</h2>
+            {/* Opponent, won/lost/ongoing, refresh */}
+            {/* Only show ongoing games */}
             <section className="section">
               <NonIdealState description="No games found." visual="list" />
             </section>
           </div>
           <div>
             <h2 className="title is-4">Find Games</h2>
+            {/* Player 1 vs. Player 2 */}
+            {/* Only show ongoing games */}
             <section className="section">
               <NonIdealState description="No games found." visual="search-template" />
             </section>

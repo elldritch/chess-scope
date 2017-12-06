@@ -1,9 +1,11 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 
-import { userReducer, userEpic, UserAction, UserState } from './user';
+import { UserAction, userEpic, userReducer, UserState } from './user';
+import { LobbyAction, lobbyEpic, lobbyReducer, LobbyState } from './lobby';
 
 export type State = {
+  lobby: LobbyState;
   user: UserState;
   router: {
     location: {
@@ -15,8 +17,8 @@ export type State = {
   };
 };
 
-export type Action = UserAction;
+export type Action = UserAction | LobbyAction;
 
-export const reducers = { user: userReducer };
+export const reducers = { user: userReducer, lobby: lobbyReducer };
 
-export const epic = combineEpics(userEpic);
+export const epic = combineEpics(userEpic, lobbyEpic);
