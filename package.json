@@ -11,7 +11,7 @@
     "clean": "rm -rf dist tmp",
     "start": "node dist/server.js",
     "dev": "nodemon --ext ts,js,json,pug --ignore dist/ --ignore tmp/ --ignore app/ --exec 'npm run build && npm start || true' & webpack-dev-server --port 8081",
-    "format": "prettier --write **/*.tsx **/*.ts"
+    "format": "prettier --write **/*.tsx **/*.ts && tslint --fix"
   },
   "dependencies": {
     "@blueprintjs/core": "^1.33.0",
@@ -54,11 +54,13 @@
     "babelify": "^8.0.0",
     "browserify": "^14.5.0",
     "cz-conventional-changelog": "^2.1.0",
+    "fork-ts-checker-webpack-plugin": "^0.2.9",
     "nodemon": "^1.12.1",
     "pug": "^2.0.0-rc.4",
     "react-hot-loader": "^3.1.3",
     "ts-loader": "^3.1.1",
-    "typescript": "^2.6.1",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"
   },

@@ -1,17 +1,17 @@
 import { NetworkError } from '../util/types';
-import { User, NotLoggedInError, LoginError } from './models';
+import { LoginError, NotLoggedInError, User } from './models';
 
-export type LoadUser = { type: 'LOAD_USER' };
-export type LoadUserSucceeded = { type: 'LOAD_USER_SUCCEEDED'; user: User };
-export type LoadUserFailed = { type: 'LOAD_USER_FAILED'; error: NotLoggedInError | NetworkError };
+export interface LoadUser { type: 'LOAD_USER'; }
+export interface LoadUserSucceeded { type: 'LOAD_USER_SUCCEEDED'; user: User; }
+export interface LoadUserFailed { type: 'LOAD_USER_FAILED'; error: NotLoggedInError | NetworkError; }
 
-export type Login = { type: 'LOG_IN'; username: string; password: string };
-export type LoginSucceeded = { type: 'LOG_IN_SUCCEEDED'; user: User };
-export type LoginFailed = { type: 'LOG_IN_FAILED'; error: LoginError | NetworkError };
+export interface Login { type: 'LOG_IN'; username: string; password: string; }
+export interface LoginSucceeded { type: 'LOG_IN_SUCCEEDED'; user: User; }
+export interface LoginFailed { type: 'LOG_IN_FAILED'; error: LoginError | NetworkError; }
 
-export type Logout = { type: 'LOG_OUT' };
-export type LogoutSucceeded = { type: 'LOG_OUT_SUCCEEDED' };
-export type LogoutFailed = { type: 'LOG_OUT_FAILED'; error: NetworkError };
+export interface Logout { type: 'LOG_OUT'; }
+export interface LogoutSucceeded { type: 'LOG_OUT_SUCCEEDED'; }
+export interface LogoutFailed { type: 'LOG_OUT_FAILED'; error: NetworkError; }
 
 export type UserAction =
   | LoadUser

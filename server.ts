@@ -9,15 +9,16 @@ const TACSCOPE_HOST = process.env.TACSCOPE_HOST || 'localhost';
 const TACSCOPE_PORT = +(process.env.TACSCOPE_PORT || 8080);
 
 if (isNaN(TACSCOPE_PORT)) {
+  // tslint:disable-next-line:no-console
   console.log('$TACSCOPE_PORT must be a number.');
   process.exit(1);
 }
 
 // Set up HTTP proxy.
 const httpProxy = createProxyServer({
-  target: 'https://lichess.org',
   changeOrigin: true,
   cookieDomainRewrite: '',
+  target: 'https://lichess.org',
 });
 
 httpProxy.on('proxyReq', (proxyReq, req, res) => {
@@ -29,14 +30,14 @@ httpProxy.on('proxyRes', (proxyRes, req, res) => {
   // Strip `Secure; ` from `set-cookie` header so cookie works over HTTP (i.e. localhost).
   const setCookies = proxyRes.headers['set-cookie'];
   if (setCookies) {
-    proxyRes.headers['set-cookie'] = setCookies.map(cookie => cookie.replace('Secure; ', ''));
+    proxyRes.headers['set-cookie'] = setCookies.map((cookie) => cookie.replace('Secure; ', ''));
   }
 });
 
 // Set up WebSocket proxy.
 const wsProxy = createProxyServer({
-  target: 'wss://socket.lichess.org',
   changeOrigin: true,
+  target: 'wss://socket.lichess.org',
   ws: true,
 });
 
@@ -52,6 +53,7 @@ app.use('/assets', express.static(path.join(__dirname, 'app', 'assets')));
 app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'app', 'index.html')));
 
 // Listen.
+// tslint:disable-next-line:no-console
 console.log(`Listening on ${TACSCOPE_HOST}:${TACSCOPE_PORT}`);
 
 const server = app.listen(TACSCOPE_PORT);

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import FindGame from './components/lobby/FindGame';
 import Login from './components/user/Login';

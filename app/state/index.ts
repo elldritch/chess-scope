@@ -1,10 +1,10 @@
-import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
+import { Observable } from 'rxjs';
 
-import { UserAction, userEpic, userReducer, UserState } from './user';
 import { LobbyAction, lobbyEpic, lobbyReducer, LobbyState } from './lobby';
+import { UserAction, userEpic, userReducer, UserState } from './user';
 
-export type State = {
+export interface State {
   lobby: LobbyState;
   user: UserState;
   router: {
@@ -15,7 +15,7 @@ export type State = {
       key: string;
     };
   };
-};
+}
 
 export type Action = UserAction | LobbyAction;
 

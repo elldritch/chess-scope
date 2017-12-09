@@ -3,17 +3,17 @@ import { Observable } from 'rxjs';
 
 import * as qs from 'qs';
 
-import { networkError, notFoundError, serverError, Error } from './types';
+import { Error, networkError, notFoundError, serverError } from './types';
 
 export function fetch<A extends Action, S extends Action, F extends Action>(
-  url: string,
+  makeUrl: (action: A) => string,
   makeOptions: (action: A) => Partial<RequestInit>,
   handleErr: (res: Response) => void,
   successAction: (data: any) => S,
   failAction: (err: Error<any, any>) => F,
   action$: Observable<A>,
 ): Observable<S | F> {
-  return action$.switchMap(action => {
+  return action$.switchMap((action) => {
     const options = makeOptions(action);
 
     // Don't forget to send cookies.
@@ -36,11 +36,11 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
       }
     } else if (options.headers) {
       // Set form content-type.
-      if (options.body && options.headers.filter(header => header[0] === 'Content-Type').length === 0) {
+      if (options.body && options.headers.filter((header) => header[0] === 'Content-Type').length === 0) {
         options.headers.push(['Content-Type', 'application/x-www-form-urlencoded']);
       }
       // Set lichess headers.
-      if (options.headers.filter(header => header[0] === 'Accept').length === 0) {
+      if (options.headers.filter((header) => header[0] === 'Accept').length === 0) {
         options.headers.push(['Accept', 'application/vnd.lichess.v1+json']);
       }
     } else {
@@ -54,11 +54,11 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
 
     return Observable.from(
       window
-        .fetch(url, options)
-        .catch(err => {
+        .fetch(makeUrl(action), options)
+        .catch((err) => {
           throw networkError(err);
         })
-        .then(res => {
+        .then((res) => {
           if (res.ok) {
             return res.json();
           }
@@ -75,6 +75,6 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
         }),
     )
       .map(successAction)
-      .catch(err => Observable.of(failAction(err)));
+      .catch((err) => Observable.of(failAction(err)));
   });
 }

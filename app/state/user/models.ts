@@ -1,15 +1,15 @@
 import { Async, Error, NetworkError } from '../util/types';
 
 // Models.
-type GameRating = {
+interface GameRating {
   games: number;
   prog: number;
   prov: boolean;
   rating: number;
   rd: number;
-};
+}
 
-export type NowPlayingGame = {
+export interface NowPlayingGame {
   color: 'white' | 'black';
   fen: string;
   fullId: string;
@@ -29,9 +29,9 @@ export type NowPlayingGame = {
     key: string;
     name: string;
   };
-};
+}
 
-export type User = {
+export interface User {
   createdAt: number;
   id: string;
   language?: string;
@@ -57,7 +57,7 @@ export type User = {
   };
   seenAt: number;
   username: string;
-};
+}
 
 export type UserState = Readonly<Async<User | null, LoginError | NotLoggedInError | NetworkError>>;
 

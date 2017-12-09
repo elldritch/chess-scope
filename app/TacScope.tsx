@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@blueprintjs/core';
 
@@ -8,33 +8,23 @@ import routes from './routes';
 import { State } from './state';
 import { loadUser, LoadUser, UserState } from './state/user';
 
-type TacScopeProps = {
+interface TacScopeProps {
   user: UserState;
   path: string;
   loadUser(): LoadUser;
-};
+}
 
 class TacScope extends React.Component<TacScopeProps, {}> {
-  // private socket: WebSocket;
-
-  constructor(props: TacScopeProps) {
-    super(props);
-  }
-
-  componentDidMount() {
+  public componentDidMount() {
     this.props.loadUser();
     // const board = ChessBoard('chessboard', {
     //   pieceTheme: (piece: Piece) => `/assets/pieces/${piece}.png`,
     //   position: 'start',
     // });
     // console.log(board);
-    // this.socket = new WebSocket(`ws://localhost:8080/socket?sri=${Math.random().toString(36).substring(2)}`)
-    // this.socket.onopen = (e: any) => console.log('opened')
-    // this.socket.onclose= () => console.log('closed')
-    // this.socket.onmessage= message => console.log(message)
   }
 
-  render() {
+  public render() {
     return (
       <span>
         <section className="hero">

@@ -8,17 +8,17 @@ import { NonIdealState } from '@blueprintjs/core';
 import { State } from '../../state';
 import { logout, Logout, UserState } from '../../state/user';
 
-type LogoutProps = {
+interface LogoutProps {
   user: UserState;
   logout(): Logout;
-};
+}
 
 class LogoutComponent extends React.Component<LogoutProps> {
-  componentDidMount() {
+  public componentDidMount() {
     this.props.logout();
   }
 
-  render() {
+  public render() {
     if (!this.props.user.data) {
       return <Redirect to="/" />;
     }

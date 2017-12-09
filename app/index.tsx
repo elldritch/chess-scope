@@ -3,13 +3,13 @@ import * as ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { Provider } from 'react-redux';
 import { ConnectedRouter, push, routerMiddleware, routerReducer } from 'react-router-redux';
-import { applyMiddleware, createStore, combineReducers, compose } from 'redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 
 import createHistory from 'history/createBrowserHistory';
 
+import { epic, reducers } from './state';
 import TacScope from './TacScope';
-import { reducers, epic } from './state';
 
 // Set up state-history sync.
 const history = createHistory();

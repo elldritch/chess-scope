@@ -1,26 +1,27 @@
 import { Observable } from 'rxjs';
 
 import { Action } from '../';
+import { noop } from '../util';
 import { fetch } from '../util/rpc';
 
 import {
   LoadUser,
-  LoadUserSucceeded,
-  loadUserSucceeded,
   LoadUserFailed,
   loadUserFailed,
+  loadUserSucceeded,
+  LoadUserSucceeded,
   Login,
-  LoginSucceeded,
-  loginSucceeded,
   LoginFailed,
   loginFailed,
+  LoginSucceeded,
+  loginSucceeded,
   Logout,
-  LogoutSucceeded,
-  logoutSucceeded,
   LogoutFailed,
   logoutFailed,
+  LogoutSucceeded,
+  logoutSucceeded,
 } from './actions';
-import { UserState, notLoggedInError, loginError } from './models';
+import { loginError, notLoggedInError, UserState } from './models';
 
 import { userReady } from '../lobby';
 
@@ -60,9 +61,9 @@ export function userReducer(state: UserState | undefined, action: Action): UserS
 // Effects.
 export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> {
   return fetch(
-    '/api/account/info',
-    action => ({}),
-    res => {
+    () => '/api/account/info',
+    (action) => ({}),
+    (res) => {
       if (res.status === 401) {
         throw notLoggedInError(res);
       }
@@ -75,15 +76,15 @@ export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUser
 
 export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded | LoginFailed> {
   return fetch(
-    '/api/login',
-    action => ({
-      method: 'POST',
+    () => '/api/login',
+    (action) => ({
       body: {
-        username: action.username,
         password: action.password,
+        username: action.username,
       },
+      method: 'POST',
     }),
-    res => {
+    (res) => {
       if (res.status === 401) {
         throw loginError(res);
       }
@@ -95,17 +96,16 @@ export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded
 }
 
 export function logoutEpic(action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> {
-  return fetch('/api/logout', action => ({}), res => {}, logoutSucceeded, logoutFailed, action$);
+  return fetch(() => '/api/logout', (action) => ({}), noop, logoutSucceeded, logoutFailed, action$);
 }
 
 export function userEpic(action$: Observable<Action>): Observable<Action> {
-  const userReadyEpics = Observable.merge(
+  return Observable.merge(
     loadUserEpic(action$.filter((action: Action): action is LoadUser => action.type === 'LOAD_USER')),
     loginEpic(action$.filter((action: Action): action is Login => action.type === 'LOG_IN')),
-  );
-  return Observable.merge(
-    userReadyEpics,
-    userReadyEpics.mapTo(userReady()),
     logoutEpic(action$.filter((action: Action): action is Logout => action.type === 'LOG_OUT')),
+    action$
+      .filter((action) => action.type === 'LOG_IN_SUCCEEDED' || action.type === 'LOAD_USER_SUCCEEDED')
+      .mapTo(userReady()),
   );
 }
