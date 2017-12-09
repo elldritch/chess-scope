@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { LobbyAction, lobbyEpic, lobbyReducer, LobbyState } from './lobby';
 import { UserAction, userEpic, userReducer, UserState } from './user';
 
-export interface State {
+export type State = {
   lobby: LobbyState;
   user: UserState;
   router: {
@@ -15,7 +15,7 @@ export interface State {
       key: string;
     };
   };
-}
+};
 
 export type Action = UserAction | LobbyAction;
 

@@ -30,7 +30,7 @@ httpProxy.on('proxyRes', (proxyRes, req, res) => {
   // Strip `Secure; ` from `set-cookie` header so cookie works over HTTP (i.e. localhost).
   const setCookies = proxyRes.headers['set-cookie'];
   if (setCookies) {
-    proxyRes.headers['set-cookie'] = setCookies.map((cookie) => cookie.replace('Secure; ', ''));
+    proxyRes.headers['set-cookie'] = setCookies.map(cookie => cookie.replace('Secure; ', ''));
   }
 });
 

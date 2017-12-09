@@ -8,18 +8,18 @@ import { Button } from '@blueprintjs/core';
 import { State } from '../../state';
 import { login, Login, UserState } from '../../state/user';
 
-interface LoginProps {
+type LoginProps = {
   user: UserState;
   login(username: string, password: string): Login;
-}
+};
 
-interface LoginState {
+type LoginState = {
   username: string;
   password: string;
 
   usernameInvalid: boolean;
   passwordInvalid: boolean;
-}
+};
 
 class LoginComponent extends React.Component<LoginProps, LoginState> {
   constructor(props: LoginProps) {
@@ -93,10 +93,10 @@ class LoginComponent extends React.Component<LoginProps, LoginState> {
   }
 
   private setUsername = (event: FormEvent<HTMLInputElement>) =>
-    this.setState({ username: event.currentTarget.value.trim(), usernameInvalid: false })
+    this.setState({ username: event.currentTarget.value.trim(), usernameInvalid: false });
 
   private setPassword = (event: FormEvent<HTMLInputElement>) =>
-    this.setState({ password: event.currentTarget.value.trim(), passwordInvalid: false })
+    this.setState({ password: event.currentTarget.value.trim(), passwordInvalid: false });
 
   private onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -112,7 +112,7 @@ class LoginComponent extends React.Component<LoginProps, LoginState> {
     if (this.state.username.length > 0 && this.state.password.length > 0) {
       this.props.login(this.state.username, this.state.password);
     }
-  }
+  };
 }
 
 export default connect((state: State) => ({ user: state.user }), { login })(LoginComponent);

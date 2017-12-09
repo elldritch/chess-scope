@@ -8,10 +8,10 @@ import { NonIdealState } from '@blueprintjs/core';
 import { State } from '../../state';
 import { logout, Logout, UserState } from '../../state/user';
 
-interface LogoutProps {
+type LogoutProps = {
   user: UserState;
   logout(): Logout;
-}
+};
 
 class LogoutComponent extends React.Component<LogoutProps> {
   public componentDidMount() {

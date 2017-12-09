@@ -1,10 +1,10 @@
-export interface Async<T, E = Error<string>> {
+export type Async<T, E = Error<string>> = {
   loading: boolean;
   error: E | null;
   data: T;
-}
+};
 
-export interface Paged<T> {
+export type Paged<T> = {
   currentPage: number;
   currentPageResults: T[];
   maxPerPage: number;
@@ -12,13 +12,13 @@ export interface Paged<T> {
   nbResults: number;
   nextPage: number | null;
   previousPage: number | null;
-}
+};
 
-export interface Error<Code, Reason = string, Details = {}> {
+export type Error<Code, Reason = string, Details = {}> = {
   error: Code;
   reason: Reason;
   details: Details;
-}
+};
 
 export type NetworkError = Error<'NETWORK_ERROR', 'Something went wrong with your connection.'>;
 

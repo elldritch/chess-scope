@@ -8,20 +8,15 @@ import routes from './routes';
 import { State } from './state';
 import { loadUser, LoadUser, UserState } from './state/user';
 
-interface TacScopeProps {
+type TacScopeProps = {
   user: UserState;
   path: string;
   loadUser(): LoadUser;
-}
+};
 
 class TacScope extends React.Component<TacScopeProps, {}> {
   public componentDidMount() {
     this.props.loadUser();
-    // const board = ChessBoard('chessboard', {
-    //   pieceTheme: (piece: Piece) => `/assets/pieces/${piece}.png`,
-    //   position: 'start',
-    // });
-    // console.log(board);
   }
 
   public render() {
@@ -91,19 +86,6 @@ class TacScope extends React.Component<TacScopeProps, {}> {
         <section className="section" style={{ paddingTop: 0 }}>
           <div className="container">{routes}</div>
         </section>
-        {/* <section className="section">
-          <div className="container">
-            <div className="columns">
-              <div className="column">
-                <div id="chessboard" style={{ width: `${80 * 8 + 2}px` }} />
-              </div>
-              <div className="column">
-                <h3>Right Panel</h3>
-                <p>Lorem ipsum.</p>
-              </div>
-            </div>
-          </div>
-        </section> */}
       </span>
     );
   }

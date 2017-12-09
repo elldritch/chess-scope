@@ -62,8 +62,8 @@ export function userReducer(state: UserState | undefined, action: Action): UserS
 export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> {
   return fetch(
     () => '/api/account/info',
-    (action) => ({}),
-    (res) => {
+    action => ({}),
+    res => {
       if (res.status === 401) {
         throw notLoggedInError(res);
       }
@@ -77,14 +77,14 @@ export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUser
 export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded | LoginFailed> {
   return fetch(
     () => '/api/login',
-    (action) => ({
+    action => ({
       body: {
         password: action.password,
         username: action.username,
       },
       method: 'POST',
     }),
-    (res) => {
+    res => {
       if (res.status === 401) {
         throw loginError(res);
       }
@@ -96,7 +96,7 @@ export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded
 }
 
 export function logoutEpic(action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> {
-  return fetch(() => '/api/logout', (action) => ({}), noop, logoutSucceeded, logoutFailed, action$);
+  return fetch(() => '/api/logout', action => ({}), noop, logoutSucceeded, logoutFailed, action$);
 }
 
 export function userEpic(action$: Observable<Action>): Observable<Action> {
@@ -105,7 +105,7 @@ export function userEpic(action$: Observable<Action>): Observable<Action> {
     loginEpic(action$.filter((action: Action): action is Login => action.type === 'LOG_IN')),
     logoutEpic(action$.filter((action: Action): action is Logout => action.type === 'LOG_OUT')),
     action$
-      .filter((action) => action.type === 'LOG_IN_SUCCEEDED' || action.type === 'LOAD_USER_SUCCEEDED')
+      .filter(action => action.type === 'LOG_IN_SUCCEEDED' || action.type === 'LOAD_USER_SUCCEEDED')
       .mapTo(userReady()),
   );
 }
