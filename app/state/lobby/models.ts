@@ -1,8 +1,8 @@
-import { WebSocketSubject } from 'rxjs/observable/dom/WebSocketSubject';
-
-import { Paged } from '../../state/util/models';
+import { Paged } from '../util/models';
+import { WrappedSocket } from '../util/sockets';
 import { Async } from '../util/types';
 
+// API response models.
 export type Player = {
   readonly lag?: number;
   readonly name: string;
@@ -41,13 +41,7 @@ export type Game = {
   readonly winner: 'black' | 'white';
 };
 
-export type LobbyState = Readonly<{
-  readonly socket: WebSocketSubject<LichessMessage> | null;
-  readonly challenges: ReadonlyArray<Challenge>;
-  readonly games: Async<Paged<Game> | null>;
-  readonly players: number | null;
-}>;
-
+// WebSocket response models.
 export type ChallengePlayer = Player & {
   readonly id: string;
 };
@@ -117,4 +111,32 @@ export type Simuls = {
   readonly d: string;
 };
 
-export type LichessMessage = Challenges | Pong | ReloadSeeks | ReloadForum | Tournaments | Featured | Simuls;
+export type FollowingOnlines = {
+  readonly t: 'following_onlines';
+  readonly d: ReadonlyArray<{}>;
+  readonly patrons: ReadonlyArray<{}>;
+  readonly playing: ReadonlyArray<{}>;
+  readonly studying: ReadonlyArray<{}>;
+};
+
+export type Streams = {
+  readonly t: 'streams';
+  readonly d: string;
+};
+
+export type LichessServerMessage = Challenges | Pong | ReloadSeeks | ReloadForum | Tournaments | Featured | Simuls;
+
+export type Ping = {
+  readonly t: 'p';
+  readonly v: number;
+};
+
+export type LichessClientMessage = Ping;
+
+// State model.
+export type LobbyState = Readonly<{
+  readonly socket: Async<WrappedSocket<LichessServerMessage, LichessClientMessage> | null>;
+  readonly challenges: ReadonlyArray<Challenge>;
+  readonly games: Async<Paged<Game> | null>;
+  readonly players: number | null;
+}>;

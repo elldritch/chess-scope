@@ -32,9 +32,10 @@ class Play extends React.Component<PlayProps> {
 
   public componentDidUpdate() {
     if (!this.props.game.loading && this.props.game.data) {
+      console.log(this.props.game.data);
       const board = ChessBoard('chessboard', {
         pieceTheme: piece => `/assets/pieces/${piece}.png`,
-        position: 'start',
+        position: this.props.game.data.game.fen,
       });
 
       console.log(board);

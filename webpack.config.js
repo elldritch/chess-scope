@@ -4,7 +4,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
-  entry: ['babel-polyfill', 'react-hot-loader/patch', './app/index'],
+  entry: ['babel-polyfill', 'react-hot-loader/patch', 'webpack/hot/only-dev-server', './app/index'],
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.json'],
   },
@@ -17,13 +17,17 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new ForkTsCheckerWebpackPlugin(),
+    // new ForkTsCheckerWebpackPlugin(),
   ],
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ['react-hot-loader/webpack', 'babel-loader', { loader: 'ts-loader', options: { transpileOnly: true } }],
+        use: [
+          'react-hot-loader/webpack',
+          'babel-loader',
+          { loader: 'ts-loader' /* , options: { transpileOnly: true } */ },
+        ],
         include: [path.join(__dirname, 'app')],
       },
     ],

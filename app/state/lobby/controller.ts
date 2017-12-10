@@ -1,25 +1,27 @@
 import { MiddlewareAPI } from 'redux';
 
 import { Observable } from 'rxjs';
-import { WebSocketSubject } from 'rxjs/observable/dom/WebSocketSubject';
 
 import { stringify } from 'qs';
 
 import { Action, State } from '../';
 import { noop } from '../util';
 import { fetch } from '../util/rpc';
+import { connect, makeEpic } from '../util/sockets';
+import { NetworkError } from '../util/types';
 
 import {
+  connectLobbyFailed,
+  connectLobbySucceeded,
   LoadGames,
-  loadGames,
   LoadGamesFailed,
   loadGamesFailed,
   LoadGamesSucceeded,
   loadGamesSucceeded,
-  ping,
+  sendPing,
   updateChallenges,
 } from './actions';
-import { LichessMessage, LobbyState } from './models';
+import { LichessClientMessage, LichessServerMessage, LobbyState } from './models';
 
 // Reducer.
 export function lobbyReducer(state: LobbyState | undefined, action: Action): LobbyState {
@@ -32,25 +34,37 @@ export function lobbyReducer(state: LobbyState | undefined, action: Action): Lob
         loading: false,
       },
       players: null,
-      socket: null,
+      socket: {
+        data: null,
+        error: null,
+        loading: false,
+      },
     };
   }
 
   switch (action.type) {
-    case 'USER_READY':
-      const socket = Observable.webSocket<LichessMessage>(
+    case 'CONNECT_LOBBY':
+      const socket = connect<LichessServerMessage, LichessClientMessage>(
         `ws://localhost:8080/lobby/socket/v1?mobile=1&sri=${Math.random()
           .toString(36)
           .substring(2)}&version=0`,
       );
-      return { ...state, socket };
+      return { ...state, socket: { data: socket, error: null, loading: true } };
+
+    case 'CONNECT_LOBBY_SUCCEEDED':
+      return { ...state, socket: { ...state.socket, loading: false } };
+
+    case 'CONNECT_LOBBY_FAILED':
+      return { ...state, socket: { ...state.socket, loading: false, error: action.error } };
 
     case 'LOG_OUT_SUCCEEDED':
-      state.socket!.socket.close();
-      return { ...state, socket: null };
+      if (state.socket.data) {
+        state.socket.data.close();
+      }
+      return { ...state, socket: { data: null, error: null, loading: false } };
 
-    case 'PING':
-      state.socket!.socket.send(JSON.stringify({ t: 'p', v: 1 }));
+    case 'SEND_PING':
+      state.socket.data!.send({ t: 'p', v: 1 });
       return state;
 
     case 'UPDATE_CHALLENGES':
@@ -85,10 +99,11 @@ export function loadGamesEpic(
   );
 }
 
-export function ws$(socket: WebSocketSubject<LichessMessage>): Observable<Action> {
-  return Observable.merge(
-    Observable.interval(1000).mapTo(ping()),
-    socket.flatMap(message => {
+export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<State>): Observable<Action> {
+  const socketEpics = makeEpic<LichessServerMessage, LichessClientMessage, Action, NetworkError>({
+    action$,
+    getSocket: () => store.getState().lobby.socket.data!,
+    dispatchMessage: message => {
       switch (message.t) {
         case 'challenges':
           return Observable.of(updateChallenges(message.d.in));
@@ -104,18 +119,18 @@ export function ws$(socket: WebSocketSubject<LichessMessage>): Observable<Action
           console.log(message);
           return Observable.empty<Action>();
       }
-    }),
-  );
-}
+    },
+    startSelector: action => action.type === 'CONNECT_LOBBY',
+    stopSelector: action => action.type === 'LOG_OUT_SUCCEEDED',
+    success: connectLobbySucceeded,
+    failure: connectLobbyFailed,
+  });
 
-export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<State>): Observable<Action> {
-  return Observable.merge(
-    action$.filter(action => action.type === 'USER_READY').mapTo(loadGames()),
-    loadGamesEpic(action$.filter((action): action is LoadGames => action.type === 'LOAD_GAMES'), store),
-    action$
-      .filter(action => action.type === 'USER_READY')
-      .flatMap(() =>
-        ws$(store.getState().lobby.socket!).takeUntil(action$.filter(action => action.type === 'LOG_OUT_SUCCEEDED')),
-      ),
-  );
+  const pingEpic = Observable.interval(1000)
+    .mapTo(sendPing())
+    .skipUntil(action$.filter(action => action.type === 'CONNECT_LOBBY_SUCCEEDED'));
+
+  const apiEpics = loadGamesEpic(action$.filter((action): action is LoadGames => action.type === 'LOAD_GAMES'), store);
+
+  return Observable.merge(socketEpics, pingEpic, apiEpics);
 }

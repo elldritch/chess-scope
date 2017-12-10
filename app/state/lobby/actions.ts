@@ -3,12 +3,23 @@ import { NetworkError } from '../util/types';
 
 import { Challenge, Game } from './models';
 
-export type UserReady = {
-  readonly type: 'USER_READY';
+export type ConnectLobby = {
+  readonly type: 'CONNECT_LOBBY';
 };
-export type Ping = {
-  readonly type: 'PING';
+
+export type ConnectLobbySucceeded = {
+  readonly type: 'CONNECT_LOBBY_SUCCEEDED';
 };
+
+export type ConnectLobbyFailed = {
+  readonly type: 'CONNECT_LOBBY_FAILED';
+  readonly error: NetworkError;
+};
+
+export type SendPing = {
+  readonly type: 'SEND_PING';
+};
+
 export type UpdateChallenges = {
   readonly type: 'UPDATE_CHALLENGES';
   readonly challenges: ReadonlyArray<Challenge>;
@@ -17,23 +28,41 @@ export type UpdateChallenges = {
 export type LoadGames = {
   readonly type: 'LOAD_GAMES';
 };
+
 export type LoadGamesSucceeded = {
   readonly type: 'LOAD_GAMES_SUCCEEDED';
   readonly games: Paged<Game>;
 };
+
 export type LoadGamesFailed = {
   readonly type: 'LOAD_GAMES_FAILED';
   readonly error: NetworkError;
 };
 
-export type LobbyAction = UserReady | Ping | UpdateChallenges | LoadGames | LoadGamesSucceeded | LoadGamesFailed;
+export type LobbyAction =
+  | ConnectLobby
+  | ConnectLobbySucceeded
+  | ConnectLobbyFailed
+  | SendPing
+  | UpdateChallenges
+  | LoadGames
+  | LoadGamesSucceeded
+  | LoadGamesFailed;
 
-export function userReady(): UserReady {
-  return { type: 'USER_READY' };
+export function connectLobby(): ConnectLobby {
+  return { type: 'CONNECT_LOBBY' };
 }
 
-export function ping(): Ping {
-  return { type: 'PING' };
+export function connectLobbySucceeded(): ConnectLobbySucceeded {
+  return { type: 'CONNECT_LOBBY_SUCCEEDED' };
+}
+
+export function connectLobbyFailed(error: NetworkError): ConnectLobbyFailed {
+  return { type: 'CONNECT_LOBBY_FAILED', error };
+}
+
+export function sendPing(): SendPing {
+  return { type: 'SEND_PING' };
 }
 
 export function updateChallenges(challenges: ReadonlyArray<Challenge>): UpdateChallenges {

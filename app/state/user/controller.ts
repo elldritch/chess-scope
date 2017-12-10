@@ -23,8 +23,6 @@ import {
 } from './actions';
 import { loginError, notLoggedInError, UserState } from './models';
 
-import { userReady } from '../lobby';
-
 // Reducer.
 export function userReducer(state: UserState | undefined, action: Action): UserState {
   if (!state) {
@@ -104,8 +102,5 @@ export function userEpic(action$: Observable<Action>): Observable<Action> {
     loadUserEpic(action$.filter((action: Action): action is LoadUser => action.type === 'LOAD_USER')),
     loginEpic(action$.filter((action: Action): action is Login => action.type === 'LOG_IN')),
     logoutEpic(action$.filter((action: Action): action is Logout => action.type === 'LOG_OUT')),
-    action$
-      .filter(action => action.type === 'LOG_IN_SUCCEEDED' || action.type === 'LOAD_USER_SUCCEEDED')
-      .mapTo(userReady()),
   );
 }

@@ -72,7 +72,7 @@ export type Game = {
     };
     readonly rating: number;
     readonly provisional: boolean;
-    readonly ai: null;
+    readonly ai: boolean | null;
   };
   readonly url: {
     readonly socket: string;
@@ -96,19 +96,7 @@ export type Game = {
   };
   readonly takebackable: boolean;
   readonly possibleMoves: {
-    readonly b2: string;
-    readonly e1: string;
-    readonly g2: string;
-    readonly f1: string;
-    readonly e5: string;
-    readonly c2: string;
-    readonly b1: string;
-    readonly g1: string;
-    readonly h2: string;
-    readonly c1: string;
-    readonly d1: string;
-    readonly a2: string;
-    readonly f2: string;
+    readonly [position: string]: string;
   };
   readonly steps: [
     {
@@ -122,7 +110,8 @@ export type Game = {
 };
 
 export type GameState = {
-  readonly game: Async<Game>;
+  readonly game: Async<Game | null>;
+  readonly socket: Async<null>;
 };
 
 // Actions.
@@ -139,6 +128,11 @@ export type LoadGameSucceeded = {
 export type LoadGameFailed = {
   readonly type: 'LOAD_GAME_FAILED';
   readonly error: NetworkError;
+};
+
+export type ConnectGame = {
+  readonly type: 'CONNECT_GAME';
+  readonly gameId: string;
 };
 
 export type GameAction = LoadGame | LoadGameSucceeded | LoadGameFailed;
@@ -158,9 +152,18 @@ export function loadGameFailed(error: NetworkError): LoadGameFailed {
 // Reducers.
 export function gameReducer(state: GameState | undefined, action: Action): GameState {
   if (!state) {
-    // TODO: re-enable on completion
-    // tslint:disable-next-line
-    return { game: { loading: false, data: {} as Game, error: null } };
+    return {
+      game: {
+        loading: false,
+        data: null,
+        error: null,
+      },
+      socket: {
+        loading: false,
+        data: null,
+        error: null,
+      },
+    };
   }
 
   switch (action.type) {

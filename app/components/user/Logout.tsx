@@ -14,7 +14,9 @@ type LogoutProps = {
 
 class LogoutComponent extends React.Component<LogoutProps> {
   public componentDidMount() {
-    this.props.logout();
+    if (this.props.user.data) {
+      this.props.logout();
+    }
   }
 
   public render() {
