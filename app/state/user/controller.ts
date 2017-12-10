@@ -62,7 +62,7 @@ export function userReducer(state: UserState | undefined, action: Action): UserS
 export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> {
   return fetch(
     () => '/api/account/info',
-    action => ({}),
+    () => ({}),
     res => {
       if (res.status === 401) {
         throw notLoggedInError(res);
@@ -79,8 +79,8 @@ export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded
     () => '/api/login',
     action => ({
       body: {
-        password: action.password,
         username: action.username,
+        password: action.password,
       },
       method: 'POST',
     }),
@@ -96,7 +96,7 @@ export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded
 }
 
 export function logoutEpic(action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> {
-  return fetch(() => '/api/logout', action => ({}), noop, logoutSucceeded, logoutFailed, action$);
+  return fetch(() => '/api/logout', () => ({}), noop, logoutSucceeded, logoutFailed, action$);
 }
 
 export function userEpic(action$: Observable<Action>): Observable<Action> {

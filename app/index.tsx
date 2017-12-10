@@ -1,10 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
 import { Provider } from 'react-redux';
-import { ConnectedRouter, push, routerMiddleware, routerReducer } from 'react-router-redux';
+import { ConnectedRouter, routerMiddleware, routerReducer } from 'react-router-redux';
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
+
+// tslint:disable-next-line:no-implicit-dependencies
+import { AppContainer } from 'react-hot-loader';
 
 import createHistory from 'history/createBrowserHistory';
 
@@ -18,7 +20,7 @@ const reduxRouter = routerMiddleware(history);
 // Set up effect system.
 declare global {
   interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+    readonly __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
   }
 }
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -29,7 +31,7 @@ const store = createStore(
     ...reducers,
     router: routerReducer,
   }),
-  composeEnhancers(applyMiddleware(routerMiddleware(history), createEpicMiddleware(epic))),
+  composeEnhancers(applyMiddleware(reduxRouter, createEpicMiddleware(epic))),
 );
 
 // Set up hot reloading.

@@ -2,15 +2,16 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { AnchorButton, NonIdealState, Position, Spinner, Tooltip } from '@blueprintjs/core';
+import { AnchorButton, Classes, NonIdealState, Position, Spinner, Tooltip } from '@blueprintjs/core';
 
 import { State } from '../../state';
 import { Challenge, Game } from '../../state/lobby';
-import { Async, Paged } from '../../state/util/types';
+import { Paged } from '../../state/util/models';
+import { Async } from '../../state/util/types';
 
 type FindGameProps = {
-  challenges: Challenge[];
-  games: Async<Paged<Game>>;
+  readonly challenges: ReadonlyArray<Challenge>;
+  readonly games: Async<Paged<Game>>;
 };
 
 class FindGame extends React.Component<FindGameProps> {
@@ -21,7 +22,7 @@ class FindGame extends React.Component<FindGameProps> {
           <div className="tile is-child">
             <h2 className="title is-4">Incoming Challenges</h2>
             {this.props.challenges.length > 0 ? (
-              <table className="pt-table pt-interactive">
+              <table className={[Classes.TABLE, Classes.INTERACTIVE].join(' ')}>
                 <thead>
                   <tr>
                     <th>Opponent</th>
@@ -54,10 +55,10 @@ class FindGame extends React.Component<FindGameProps> {
             {/* Refresh, show completed games */}
             {this.props.games.loading ? (
               <div style={{ textAlign: 'center', padding: '4em' }}>
-                <Spinner className="pt-small" />
+                <Spinner className={Classes.SMALL} />
               </div>
             ) : this.props.games.data && this.props.games.data.currentPageResults.length > 0 ? (
-              <table className="pt-table pt-interactive">
+              <table className={[Classes.TABLE, Classes.INTERACTIVE].join(' ')}>
                 <thead>
                   <tr>
                     <th>Opponent</th>
@@ -120,7 +121,7 @@ class FindGame extends React.Component<FindGameProps> {
                 <div className="has-text-centered">
                   {/* <Link to="/create"> */}
                   <Tooltip content="Coming soon!" position={Position.BOTTOM}>
-                    <AnchorButton className="pt-large" text="Create game" disabled />
+                    <AnchorButton className={Classes.LARGE} text="Create game" disabled />
                   </Tooltip>
                   {/* </Link> */}
                 </div>

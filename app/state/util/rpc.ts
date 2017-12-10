@@ -67,11 +67,11 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
 
           if (res.status === 404) {
             throw notFoundError(res);
-          } else if (res.status === 500) {
-            throw serverError(res);
-          } else {
-            throw networkError(res);
           }
+          if (res.status === 500) {
+            throw serverError(res);
+          }
+          throw networkError(res);
         }),
     )
       .map(successAction)

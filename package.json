@@ -61,6 +61,11 @@
     "ts-loader": "^3.1.1",
     "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.6.0",
+    "tslint-consistent-codestyle": "^1.11.0",
+    "tslint-divid": "^1.0.4",
+    "tslint-eslint-rules": "^4.1.1",
+    "tslint-immutable": "^4.4.0",
+    "tslint-react": "^3.2.0",
     "typescript": "^2.6.2",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"

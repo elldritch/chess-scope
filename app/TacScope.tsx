@@ -2,24 +2,24 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { Button } from '@blueprintjs/core';
+import { Button, Classes, Spinner } from '@blueprintjs/core';
 
 import routes from './routes';
 import { State } from './state';
 import { loadUser, LoadUser, UserState } from './state/user';
 
 type TacScopeProps = {
-  user: UserState;
-  path: string;
-  loadUser(): LoadUser;
+  readonly user: UserState;
+  readonly path: string;
+  readonly loadUser: () => LoadUser;
 };
 
-class TacScope extends React.Component<TacScopeProps, {}> {
-  public componentDidMount() {
+class TacScope extends React.Component<TacScopeProps> {
+  public componentDidMount(): void {
     this.props.loadUser();
   }
 
-  public render() {
+  public render(): JSX.Element {
     return (
       <span>
         <section className="hero">
@@ -55,26 +55,16 @@ class TacScope extends React.Component<TacScopeProps, {}> {
                       </div>,
                       <div className="level-item" key="log-out-button">
                         <Link to="/logout">
-                          <Button className="pt-large" text="Log out" />
+                          <Button className={Classes.LARGE} text="Log out" />
                         </Link>
                       </div>,
                     ]
                   ) : this.props.user.loading ? (
-                    <div className="pt-spinner pt-small">
-                      <div className="pt-spinner-svg-container">
-                        <svg viewBox="0 0 100 100">
-                          <path
-                            className="pt-spinner-track"
-                            d="M 50,50 m 0,-44.5 a 44.5,44.5 0 1 1 0,89 a 44.5,44.5 0 1 1 0,-89"
-                          />
-                          <path className="pt-spinner-head" d="M 94.5 50 A 44.5 44.5 0 0 0 50 5.5" />
-                        </svg>
-                      </div>
-                    </div>
+                    <Spinner className={Classes.SMALL} />
                   ) : (
                     <div className="level-item">
                       <Link to="/login">
-                        <Button className="pt-large" text="Log in" />
+                        <Button className={Classes.LARGE} text="Log in" />
                       </Link>
                     </div>
                   )}

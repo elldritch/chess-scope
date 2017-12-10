@@ -2,61 +2,61 @@ import { Async, Error, NetworkError } from '../util/types';
 
 // Models.
 type GameRating = {
-  games: number;
-  prog: number;
-  prov: boolean;
-  rating: number;
-  rd: number;
+  readonly games: number;
+  readonly prog: number;
+  readonly prov: boolean;
+  readonly rating: number;
+  readonly rd: number;
 };
 
 export type NowPlayingGame = {
-  color: 'black' | 'white';
-  fen: string;
-  fullId: string;
-  gameId: string;
-  isMyTurn: boolean;
-  lastMove: string;
-  opponent: {
-    id: string;
-    username: string;
-    rating: number;
+  readonly color: 'black' | 'white';
+  readonly fen: string;
+  readonly fullId: string;
+  readonly gameId: string;
+  readonly isMyTurn: boolean;
+  readonly lastMove: string;
+  readonly opponent: {
+    readonly id: string;
+    readonly username: string;
+    readonly rating: number;
   };
-  perf: string;
-  rated: boolean;
-  secondsLeft: number | null;
-  speed: string;
-  variant: {
-    key: string;
-    name: string;
+  readonly perf: string;
+  readonly rated: boolean;
+  readonly secondsLeft: number | null;
+  readonly speed: string;
+  readonly variant: {
+    readonly key: string;
+    readonly name: string;
   };
 };
 
 export type User = {
-  createdAt: number;
-  id: string;
-  language?: string;
-  profile?: Partial<{
-    bio: string;
-    country: string;
-    firstName: string;
-    lastName: string;
-    location: string;
+  readonly createdAt: number;
+  readonly id: string;
+  readonly language?: string;
+  readonly profile?: Partial<{
+    readonly bio: string;
+    readonly country: string;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly location: string;
   }>;
-  nowPlaying: NowPlayingGame[];
-  online: boolean;
-  perfs: {
-    blitz: GameRating;
-    bullet: GameRating;
-    classical: GameRating;
-    correspondence: GameRating;
-    rapid: GameRating;
+  readonly nowPlaying: ReadonlyArray<NowPlayingGame>;
+  readonly online: boolean;
+  readonly perfs: {
+    readonly blitz: GameRating;
+    readonly bullet: GameRating;
+    readonly classical: GameRating;
+    readonly correspondence: GameRating;
+    readonly rapid: GameRating;
   };
-  playTime: {
-    total: 0;
-    tv: 0;
+  readonly playTime: {
+    readonly total: 0;
+    readonly tv: 0;
   };
-  seenAt: number;
-  username: string;
+  readonly seenAt: number;
+  readonly username: string;
 };
 
 export type UserState = Readonly<Async<User | null, LoginError | NotLoggedInError | NetworkError>>;

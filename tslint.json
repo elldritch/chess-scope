@@ -1,11 +1,94 @@
 {
   "defaultSeverity": "error",
-  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "extends": [
+    "tslint:latest",
+    "tslint-react",
+    "tslint-immutable",
+    "tslint-consistent-codestyle",
+    "tslint-divid",
+    "tslint-eslint-rules",
+    "tslint-config-prettier"
+  ],
   "jsRules": {},
   "rules": {
-    "quotemark": [true, "single", "jsx-double", "avoid-template", "avoid-escape"],
+    // From TSLint core
     "interface-name": [true, "never-prefix"],
-    "interface-over-type-literal": false
+    "interface-over-type-literal": false,
+    "no-default-export": false,
+    "no-submodule-imports": false,
+    "object-literal-sort-keys": false,
+    "quotemark": [true, "single", "jsx-double", "avoid-template", "avoid-escape"],
+
+    // From `tslint-react`
+    "jsx-boolean-value": false,
+
+    // From `tslint-immutable`
+    "readonly-keyword": true,
+    "readonly-array": true,
+    "no-let": true,
+    "no-object-mutation": false,
+    "no-method-signature": true,
+    "no-this": false,
+    "no-class": false,
+    "no-mixed-interface": true,
+    "no-expression-statement": false,
+
+    // From `tslint-consistent-codestyle`
+    "const-parameters": true,
+    "early-exit": true,
+    "ext-curly": false,
+    "naming-convention": true,
+    "no-as-type-assertion": false,
+    "no-accessor-recursion": true,
+    "no-collapsible-if": true,
+    "no-else-after-return": false,
+    "no-return-undefined": true,
+    "no-static-this": true,
+    "no-unnecessary-else": true,
+    "no-unnecessary-type-annotation": true,
+    "no-unused": [true, "unused-function-expression-name", "unused-class-expression-name", "unused-catch-binding"],
+    "no-var-before-return": true,
+    "object-shorthand-properties-first": false,
+    "parameter-properties": false,
+    "prefer-const-enum": true,
+    "prefer-while": true,
+
+    // From `tslint-divid`
+    "import-containment": false,
+    "no-arguments": true,
+    "no-label": true,
+    "no-semicolon-interface": false,
+
+    // From `tslint-eslint-rules`
+    "no-constant-condition": true,
+    "no-control-regex": true,
+    "no-duplicate-case": true,
+    "no-empty-character-class": true,
+    "no-ex-assign": true,
+    "no-extra-boolean-cast": true,
+    "no-inner-declarations": true,
+    "no-invalid-regexp": true,
+    "no-irregular-whitespace": true,
+    "no-regex-spaces": true,
+    "no-sparse-arrays": true,
+    "no-unexpected-multiline": true,
+    "valid-jsdoc": true,
+    "valid-typeof": true,
+    "no-multi-spaces": true,
+    "handle-callback-err": true,
+    "array-bracket-spacing": [true, "never"],
+    "block-spacing": true,
+    "brace-style": [true, "1tbs"],
+    "ter-func-call-spacing": true,
+    "ter-indent": false,
+    "ter-max-len": [true, 120],
+    "object-curly-spacing": true,
+    "sort-imports": false,
+    "space-in-parens": [true, "never"],
+    "ter-arrow-body-style": true,
+    "ter-arrow-parens": [true, "as-needed"],
+    "ter-arrow-spacing": true,
+    "ter-prefer-arrow-callback": true
   },
   "rulesDirectory": []
 }

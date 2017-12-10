@@ -1,28 +1,29 @@
-import { NetworkError, Paged } from '../util/types';
+import { Paged } from '../../state/util/models';
+import { NetworkError } from '../util/types';
 
 import { Challenge, Game } from './models';
 
 export type UserReady = {
-  type: 'USER_READY';
+  readonly type: 'USER_READY';
 };
 export type Ping = {
-  type: 'PING';
+  readonly type: 'PING';
 };
 export type UpdateChallenges = {
-  type: 'UPDATE_CHALLENGES';
-  challenges: Challenge[];
+  readonly type: 'UPDATE_CHALLENGES';
+  readonly challenges: ReadonlyArray<Challenge>;
 };
 
 export type LoadGames = {
-  type: 'LOAD_GAMES';
+  readonly type: 'LOAD_GAMES';
 };
 export type LoadGamesSucceeded = {
-  type: 'LOAD_GAMES_SUCCEEDED';
-  games: Paged<Game>;
+  readonly type: 'LOAD_GAMES_SUCCEEDED';
+  readonly games: Paged<Game>;
 };
 export type LoadGamesFailed = {
-  type: 'LOAD_GAMES_FAILED';
-  error: NetworkError;
+  readonly type: 'LOAD_GAMES_FAILED';
+  readonly error: NetworkError;
 };
 
 export type LobbyAction = UserReady | Ping | UpdateChallenges | LoadGames | LoadGamesSucceeded | LoadGamesFailed;
@@ -35,7 +36,7 @@ export function ping(): Ping {
   return { type: 'PING' };
 }
 
-export function updateChallenges(challenges: Challenge[]): UpdateChallenges {
+export function updateChallenges(challenges: ReadonlyArray<Challenge>): UpdateChallenges {
   return { type: 'UPDATE_CHALLENGES', challenges };
 }
 

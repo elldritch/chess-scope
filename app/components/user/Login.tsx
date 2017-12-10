@@ -1,24 +1,23 @@
 import * as React from 'react';
-import { FormEvent } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 
-import { Button } from '@blueprintjs/core';
+import { Button, Classes } from '@blueprintjs/core';
 
 import { State } from '../../state';
 import { login, Login, UserState } from '../../state/user';
 
 type LoginProps = {
-  user: UserState;
-  login(username: string, password: string): Login;
+  readonly user: UserState;
+  readonly login: (username: string, password: string) => Login;
 };
 
 type LoginState = {
-  username: string;
-  password: string;
+  readonly username: string;
+  readonly password: string;
 
-  usernameInvalid: boolean;
-  passwordInvalid: boolean;
+  readonly usernameInvalid: boolean;
+  readonly passwordInvalid: boolean;
 };
 
 class LoginComponent extends React.Component<LoginProps, LoginState> {
@@ -42,13 +41,18 @@ class LoginComponent extends React.Component<LoginProps, LoginState> {
       <form onSubmit={this.onSubmit}>
         <div className="columns is-multiline is-gapless">
           <div className="column is-half has-text-right">
-            <label className="pt-label pt-inline pt-large pt-ui-text-large" style={{ paddingRight: '0.75em' }}>
+            <label
+              className={[Classes.LABEL, Classes.INLINE, Classes.LARGE, Classes.UI_TEXT_LARGE].join(' ')}
+              style={{ paddingRight: '0.75em' }}
+            >
               Username
             </label>
           </div>
           <div className="column is-half">
             <input
-              className={'pt-input pt-large' + (this.state.usernameInvalid ? ' pt-intent-danger' : '')}
+              className={[Classes.INPUT, Classes.LARGE]
+                .concat(this.state.usernameInvalid ? [Classes.INTENT_DANGER] : [])
+                .join(' ')}
               type="text"
               placeholder="Username"
               dir="auto"
@@ -57,19 +61,24 @@ class LoginComponent extends React.Component<LoginProps, LoginState> {
               disabled={this.props.user.loading}
             />
             {this.state.usernameInvalid ? (
-              <div className="pt-form-group pt-intent-danger">
-                <div className="pt-form-helper-text">Please enter a value</div>
+              <div className={[Classes.FORM_GROUP, Classes.INTENT_DANGER].join(' ')}>
+                <div className={Classes.FORM_HELPER_TEXT}>Please enter a value</div>
               </div>
             ) : null}
           </div>
           <div className="column is-half has-text-right">
-            <label className="pt-label pt-inline pt-large pt-ui-text-large" style={{ paddingRight: '0.75em' }}>
+            <label
+              className={[Classes.LABEL, Classes.INLINE, Classes.LARGE, Classes.UI_TEXT_LARGE].join(' ')}
+              style={{ paddingRight: '0.75em' }}
+            >
               Password
             </label>
           </div>
           <div className="column is-half">
             <input
-              className={'pt-input pt-large' + (this.state.passwordInvalid ? ' pt-intent-danger' : '')}
+              className={[Classes.INPUT, Classes.LARGE]
+                .concat(this.state.usernameInvalid ? [Classes.INTENT_DANGER] : [])
+                .join(' ')}
               type="password"
               placeholder="Password"
               dir="auto"
@@ -78,27 +87,27 @@ class LoginComponent extends React.Component<LoginProps, LoginState> {
               disabled={this.props.user.loading}
             />
             {this.state.passwordInvalid ? (
-              <div className="pt-form-group pt-intent-danger">
-                <div className="pt-form-helper-text">Please enter a value</div>
+              <div className={[Classes.FORM_GROUP, Classes.INTENT_DANGER].join(' ')}>
+                <div className={Classes.FORM_HELPER_TEXT}>Please enter a value</div>
               </div>
             ) : null}
           </div>
           <div className="column is-half" />
           <div className="column is-half">
-            <Button className="pt-large" text="Log in" type="submit" loading={this.props.user.loading} />
+            <Button className={Classes.LARGE} text="Log in" type="submit" loading={this.props.user.loading} />
           </div>
         </div>
       </form>
     );
   }
 
-  private setUsername = (event: FormEvent<HTMLInputElement>) =>
+  private readonly setUsername = (event: React.FormEvent<HTMLInputElement>) =>
     this.setState({ username: event.currentTarget.value.trim(), usernameInvalid: false });
 
-  private setPassword = (event: FormEvent<HTMLInputElement>) =>
+  private readonly setPassword = (event: React.FormEvent<HTMLInputElement>) =>
     this.setState({ password: event.currentTarget.value.trim(), passwordInvalid: false });
 
-  private onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  private readonly onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.stopPropagation();
 

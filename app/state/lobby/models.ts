@@ -1,119 +1,120 @@
 import { WebSocketSubject } from 'rxjs/observable/dom/WebSocketSubject';
 
-import { Async, Paged } from '../util/types';
+import { Paged } from '../../state/util/models';
+import { Async } from '../util/types';
 
 export type Player = {
-  lag?: number;
-  name: string;
-  online?: boolean;
-  provisional: boolean;
-  rating: number;
-  ratingDiff?: number | null;
-  title?: string | null;
+  readonly lag?: number;
+  readonly name: string;
+  readonly online?: boolean;
+  readonly provisional: boolean;
+  readonly rating: number;
+  readonly ratingDiff?: number | null;
+  readonly title?: string | null;
 };
 
 export type GamePlayer = Player & {
-  userId: string;
+  readonly userId: string;
 };
 
 export type Game = {
-  clock: {
-    initial: number;
-    increment: number;
-    totalTime: number;
+  readonly clock: {
+    readonly initial: number;
+    readonly increment: number;
+    readonly totalTime: number;
   };
-  color: 'black' | 'white';
-  createdAt: number;
-  id: string;
-  lastMoveAt: number;
-  perf: string;
-  players: {
-    white: GamePlayer;
-    black: GamePlayer;
+  readonly color: 'black' | 'white';
+  readonly createdAt: number;
+  readonly id: string;
+  readonly lastMoveAt: number;
+  readonly perf: string;
+  readonly players: {
+    readonly white: GamePlayer;
+    readonly black: GamePlayer;
   };
-  rated: boolean;
-  speed: string;
-  status: string;
-  turns: number;
-  url: string;
-  variant: string;
-  winner: 'black' | 'white';
+  readonly rated: boolean;
+  readonly speed: string;
+  readonly status: string;
+  readonly turns: number;
+  readonly url: string;
+  readonly variant: string;
+  readonly winner: 'black' | 'white';
 };
 
 export type LobbyState = Readonly<{
-  socket: WebSocketSubject<LichessMessage> | null;
-  challenges: Challenge[];
-  games: Async<Paged<Game> | null>;
-  players: number | null;
+  readonly socket: WebSocketSubject<LichessMessage> | null;
+  readonly challenges: ReadonlyArray<Challenge>;
+  readonly games: Async<Paged<Game> | null>;
+  readonly players: number | null;
 }>;
 
 export type ChallengePlayer = Player & {
-  id: string;
+  readonly id: string;
 };
 
 export type Challenge = {
-  challenger: ChallengePlayer;
-  color: 'black' | 'white' | 'random';
-  destUser: ChallengePlayer;
-  direction: 'in' | 'out';
-  id: string;
-  initialFen: string | null;
-  perf: {
-    icon: string;
-    name: string;
+  readonly challenger: ChallengePlayer;
+  readonly color: 'black' | 'white' | 'random';
+  readonly destUser: ChallengePlayer;
+  readonly direction: 'in' | 'out';
+  readonly id: string;
+  readonly initialFen: string | null;
+  readonly perf: {
+    readonly icon: string;
+    readonly name: string;
   };
-  rated: boolean;
-  status: string;
-  timeControl: {
-    type: string;
+  readonly rated: boolean;
+  readonly status: string;
+  readonly timeControl: {
+    readonly type: string;
   };
-  variant: {
-    key: string;
-    short: string;
-    name: string;
+  readonly variant: {
+    readonly key: string;
+    readonly short: string;
+    readonly name: string;
   };
 };
 
 export type Challenges = {
-  t: 'challenges';
-  d: {
-    i18n: { [phrase: string]: string };
-    in: Challenge[];
-    out: Challenge[];
+  readonly t: 'challenges';
+  readonly d: {
+    readonly i18n: { readonly [phrase: string]: string };
+    readonly in: ReadonlyArray<Challenge>;
+    readonly out: ReadonlyArray<Challenge>;
   };
 };
 
 export type Pong = {
-  t: 'n';
-  r: number;
-  d: number;
+  readonly t: 'n';
+  readonly r: number;
+  readonly d: number;
 };
 
 export type ReloadForum = {
-  t: 'reload_forum';
+  readonly t: 'reload_forum';
 };
 
 export type ReloadSeeks = {
-  t: 'reload_seeks';
+  readonly t: 'reload_seeks';
 };
 
 export type Tournaments = {
-  t: 'tournaments';
-  d: string;
+  readonly t: 'tournaments';
+  readonly d: string;
 };
 
 export type Featured = {
-  t: 'featured';
-  d: {
-    color: 'black' | 'white';
-    html: string;
-    id: string;
+  readonly t: 'featured';
+  readonly d: {
+    readonly color: 'black' | 'white';
+    readonly html: string;
+    readonly id: string;
   };
 };
 
 export type Simuls = {
-  t: 'simuls';
-  d: string;
+  readonly t: 'simuls';
+  readonly d: string;
 };
 
 export type LichessMessage = Challenges | Pong | ReloadSeeks | ReloadForum | Tournaments | Featured | Simuls;

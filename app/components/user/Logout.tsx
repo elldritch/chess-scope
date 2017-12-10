@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { FormEvent } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 
@@ -9,8 +8,8 @@ import { State } from '../../state';
 import { logout, Logout, UserState } from '../../state/user';
 
 type LogoutProps = {
-  user: UserState;
-  logout(): Logout;
+  readonly user: UserState;
+  readonly logout: () => Logout;
 };
 
 class LogoutComponent extends React.Component<LogoutProps> {

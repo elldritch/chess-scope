@@ -1,24 +1,25 @@
 import { combineEpics } from 'redux-observable';
-import { Observable } from 'rxjs';
 
+import { GameAction, gameEpic, gameReducer, GameState } from './game';
 import { LobbyAction, lobbyEpic, lobbyReducer, LobbyState } from './lobby';
 import { UserAction, userEpic, userReducer, UserState } from './user';
 
 export type State = {
-  lobby: LobbyState;
-  user: UserState;
-  router: {
-    location: {
-      pathname: string;
-      search: string;
-      hash: string;
-      key: string;
+  readonly lobby: LobbyState;
+  readonly user: UserState;
+  readonly game: GameState;
+  readonly router: {
+    readonly location: {
+      readonly pathname: string;
+      readonly search: string;
+      readonly hash: string;
+      readonly key: string;
     };
   };
 };
 
-export type Action = UserAction | LobbyAction;
+export type Action = UserAction | LobbyAction | GameAction;
 
-export const reducers = { user: userReducer, lobby: lobbyReducer };
+export const reducers = { user: userReducer, lobby: lobbyReducer, game: gameReducer };
 
-export const epic = combineEpics(userEpic, lobbyEpic);
+export const epic = combineEpics(userEpic, lobbyEpic, gameEpic);
