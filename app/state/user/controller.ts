@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
 
 import { Action } from '../';
-import { noop } from '../util';
 import { fetch } from '../util/rpc';
 
 import {
@@ -58,43 +57,47 @@ export function userReducer(state: UserState | undefined, action: Action): UserS
 
 // Effects.
 export function loadUserEpic(action$: Observable<LoadUser>): Observable<LoadUserSucceeded | LoadUserFailed> {
-  return fetch(
-    () => '/api/account/info',
-    () => ({}),
-    res => {
+  return fetch({
+    url: '/api/account/info',
+    handleErr: res => {
       if (res.status === 401) {
         throw notLoggedInError(res);
       }
     },
-    loadUserSucceeded,
-    loadUserFailed,
+    success: loadUserSucceeded,
+    failure: loadUserFailed,
     action$,
-  );
+  });
 }
 
 export function loginEpic(action$: Observable<Login>): Observable<LoginSucceeded | LoginFailed> {
-  return fetch(
-    () => '/api/login',
-    action => ({
+  return fetch({
+    url: '/api/login',
+    request: action => ({
       body: {
         username: action.username,
         password: action.password,
       },
       method: 'POST',
     }),
-    res => {
+    handleErr: res => {
       if (res.status === 401) {
         throw loginError(res);
       }
     },
-    loginSucceeded,
-    loginFailed,
+    success: loginSucceeded,
+    failure: loginFailed,
     action$,
-  );
+  });
 }
 
 export function logoutEpic(action$: Observable<Logout>): Observable<LogoutSucceeded | LogoutFailed> {
-  return fetch(() => '/api/logout', () => ({}), noop, logoutSucceeded, logoutFailed, action$);
+  return fetch({
+    url: '/api/logout',
+    success: logoutSucceeded,
+    failure: logoutFailed,
+    action$,
+  });
 }
 
 export function userEpic(action$: Observable<Action>): Observable<Action> {

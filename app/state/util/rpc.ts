@@ -5,16 +5,22 @@ import * as qs from 'qs';
 
 import { Error, networkError, notFoundError, serverError } from './types';
 
+export type fetchConfig<A extends Action, S extends Action, F extends Action> = {
+  readonly url: string | ((action: A) => string);
+  readonly request?: (action: A) => Partial<RequestInit>;
+  readonly handleErr?: (res: Response) => void;
+  readonly success: (data: any) => S;
+  readonly failure: (err: Error<any, any>) => F;
+  readonly action$: Observable<A>;
+};
+
 export function fetch<A extends Action, S extends Action, F extends Action>(
-  makeUrl: (action: A) => string,
-  makeOptions: (action: A) => Partial<RequestInit>,
-  handleErr: (res: Response) => void,
-  successAction: (data: any) => S,
-  failAction: (err: Error<any, any>) => F,
-  action$: Observable<A>,
+  config: fetchConfig<A, S, F>,
 ): Observable<S | F> {
+  const { url, request, handleErr, success, failure, action$ } = config;
+
   return action$.switchMap(action => {
-    const options = makeOptions(action);
+    const options = request ? request(action) : {};
 
     // Don't forget to send cookies.
     if (options.credentials === undefined) {
@@ -52,9 +58,11 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
       options.headers = headers;
     }
 
+    const endpoint = typeof url === 'string' ? url : url(action);
+
     return Observable.from(
       window
-        .fetch(makeUrl(action), options)
+        .fetch(endpoint, options)
         .catch(err => {
           throw networkError(err);
         })
@@ -63,7 +71,9 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
             return res.json();
           }
 
-          handleErr(res);
+          if (handleErr) {
+            handleErr(res);
+          }
 
           if (res.status === 404) {
             throw notFoundError(res);
@@ -74,7 +84,7 @@ export function fetch<A extends Action, S extends Action, F extends Action>(
           throw networkError(res);
         }),
     )
-      .map(successAction)
-      .catch(err => Observable.of(failAction(err)));
+      .map(success)
+      .catch(err => Observable.of(failure(err)));
   });
 }

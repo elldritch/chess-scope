@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { stringify } from 'qs';
 
 import { Action, State } from '../';
-import { noop } from '../util';
 import { fetch } from '../util/rpc';
 import { connect, makeEpic } from '../util/sockets';
 import { NetworkError } from '../util/types';
@@ -89,14 +88,12 @@ export function loadGamesEpic(
   action$: Observable<LoadGames>,
   store: MiddlewareAPI<State>,
 ): Observable<LoadGamesSucceeded | LoadGamesFailed> {
-  return fetch(
-    () => `/api/api/user/${store.getState().user.data!.username}/games?${stringify({ playing: 1 })}`,
-    () => ({}),
-    noop,
-    loadGamesSucceeded,
-    loadGamesFailed,
+  return fetch({
+    url: () => `/api/api/user/${store.getState().user.data!.username}/games?${stringify({ playing: 1 })}`,
+    success: loadGamesSucceeded,
+    failure: loadGamesFailed,
     action$,
-  );
+  });
 }
 
 export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<State>): Observable<Action> {

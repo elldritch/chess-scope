@@ -2,7 +2,6 @@ import { Observable } from 'rxjs';
 
 import { Action } from '../';
 
-import { noop } from '../util';
 import { fetch } from '../util/rpc';
 import { Async, NetworkError } from '../util/types';
 
@@ -183,7 +182,12 @@ export function gameReducer(state: GameState | undefined, action: Action): GameS
 
 // Effects.
 export function loadGameEpic(action$: Observable<LoadGame>): Observable<LoadGameSucceeded | LoadGameFailed> {
-  return fetch(action => `/api/${action.gameId}`, () => ({}), noop, loadGameSucceeded, loadGameFailed, action$);
+  return fetch({
+    url: action => `/api/${action.gameId}`,
+    success: loadGameSucceeded,
+    failure: loadGameFailed,
+    action$,
+  });
 }
 
 export function gameEpic(action$: Observable<Action>): Observable<Action> {
