@@ -5,25 +5,32 @@ import { ConnectedRouter, routerMiddleware, routerReducer } from 'react-router-r
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 
-// tslint:disable-next-line:no-implicit-dependencies
+// tslint:disable:no-implicit-dependencies
 import { AppContainer } from 'react-hot-loader';
+import { createDevTools } from 'redux-devtools';
+import DockMonitor from 'redux-devtools-dock-monitor';
+import FilterMonitor from 'redux-devtools-filter-actions';
+import Inspector from 'redux-devtools-inspector';
+// tslint:enable:no-implicit-dependencies
 
 import createHistory from 'history/createBrowserHistory';
 
 import { epic, reducers } from './state';
 import TacScope from './TacScope';
 
+// Set up developer tools
+const DevTools = createDevTools(
+  <DockMonitor toggleVisibilityKey="ctrl-i" changePositionKey="ctrl-p" changeMonitorKey="ctrl-m">
+    <FilterMonitor blacklist={['SEND_PING']}>
+      <Inspector />
+    </FilterMonitor>
+    <Inspector />
+  </DockMonitor>,
+);
+
 // Set up state-history sync.
 const history = createHistory();
 const reduxRouter = routerMiddleware(history);
-
-// Set up effect system.
-declare global {
-  interface Window {
-    readonly __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
-  }
-}
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 // Set up state management.
 const store = createStore(
@@ -31,7 +38,7 @@ const store = createStore(
     ...reducers,
     router: routerReducer,
   }),
-  composeEnhancers(applyMiddleware(reduxRouter, createEpicMiddleware(epic))),
+  compose(applyMiddleware(reduxRouter, createEpicMiddleware(epic)), DevTools.instrument()),
 );
 
 // Set up hot reloading.
@@ -40,7 +47,10 @@ const render = (App: React.ComponentClass) => {
     <AppContainer>
       <Provider store={store}>
         <ConnectedRouter history={history}>
-          <App />
+          <div>
+            <App />
+            <DevTools />
+          </div>
         </ConnectedRouter>
       </Provider>
     </AppContainer>,

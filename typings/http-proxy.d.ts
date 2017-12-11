@@ -1,5 +1,5 @@
 declare module 'http-proxy' {
-  // Type definitions for node-http-proxy 1.12
+  // Type definitions for node-http-proxy 1.12.2
   // Project: https://github.com/nodejitsu/node-http-proxy
   // Definitions by: Maxime LUCE <https://github.com/SomaticIT>
   // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped

@@ -125,7 +125,8 @@ export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<Stat
 
   const pingEpic = Observable.interval(1000)
     .mapTo(sendPing())
-    .skipUntil(action$.filter(action => action.type === 'CONNECT_LOBBY_SUCCEEDED'));
+    .skipUntil(action$.filter(action => action.type === 'CONNECT_LOBBY_SUCCEEDED'))
+    .takeUntil(action$.filter(action => action.type === 'CONNECT_LOBBY_FAILED'));
 
   const apiEpics = loadGamesEpic(action$.filter((action): action is LoadGames => action.type === 'LOAD_GAMES'), store);
 
