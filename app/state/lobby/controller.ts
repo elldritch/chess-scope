@@ -20,7 +20,7 @@ import {
   sendPing,
   updateChallenges,
 } from './actions';
-import { LichessClientMessage, LichessServerMessage, LobbyState } from './models';
+import { LobbyClientMessage, LobbyServerMessage, LobbyState } from './models';
 
 // Reducer.
 export function lobbyReducer(state: LobbyState | undefined, action: Action): LobbyState {
@@ -43,7 +43,7 @@ export function lobbyReducer(state: LobbyState | undefined, action: Action): Lob
 
   switch (action.type) {
     case 'CONNECT_LOBBY':
-      const socket = connect<LichessServerMessage, LichessClientMessage>(
+      const socket = connect<LobbyServerMessage, LobbyClientMessage>(
         `ws://localhost:8080/lobby/socket/v1?mobile=1&sri=${Math.random()
           .toString(36)
           .substring(2)}&version=0`,
@@ -97,7 +97,7 @@ export function loadGamesEpic(
 }
 
 export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<State>): Observable<Action> {
-  const socketEpics = makeEpic<LichessServerMessage, LichessClientMessage, Action, NetworkError>({
+  const socketEpic = makeEpic<LobbyServerMessage, LobbyClientMessage, Action, NetworkError>({
     action$,
     getSocket: () => store.getState().lobby.socket.data!,
     dispatchMessage: message => {
@@ -110,6 +110,8 @@ export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<Stat
         case 'tournaments':
         case 'featured':
         case 'simuls':
+        case 'following_onlines':
+        case 'streams':
           return Observable.empty<Action>();
         default:
           // tslint:disable-next-line:no-console
@@ -130,5 +132,5 @@ export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<Stat
 
   const apiEpics = loadGamesEpic(action$.filter((action): action is LoadGames => action.type === 'LOAD_GAMES'), store);
 
-  return Observable.merge(socketEpics, pingEpic, apiEpics);
+  return Observable.merge(socketEpic, pingEpic, apiEpics);
 }

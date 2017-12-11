@@ -124,18 +124,27 @@ export type Streams = {
   readonly d: string;
 };
 
-export type LichessServerMessage = Challenges | Pong | ReloadSeeks | ReloadForum | Tournaments | Featured | Simuls;
+export type LobbyServerMessage =
+  | Challenges
+  | Pong
+  | ReloadSeeks
+  | ReloadForum
+  | Tournaments
+  | Featured
+  | Simuls
+  | FollowingOnlines
+  | Streams;
 
 export type Ping = {
   readonly t: 'p';
   readonly v: number;
 };
 
-export type LichessClientMessage = Ping;
+export type LobbyClientMessage = Ping;
 
 // State model.
 export type LobbyState = Readonly<{
-  readonly socket: Async<WrappedSocket<LichessServerMessage, LichessClientMessage> | null>;
+  readonly socket: Async<WrappedSocket<LobbyServerMessage, LobbyClientMessage> | null>;
   readonly challenges: ReadonlyArray<Challenge>;
   readonly games: Async<Paged<Game> | null>;
   readonly players: number | null;
