@@ -16,8 +16,8 @@ export type ConnectLobbyFailed = {
   readonly error: NetworkError;
 };
 
-export type SendPing = {
-  readonly type: 'SEND_PING';
+export type LobbyPing = {
+  readonly type: 'LOBBY_PING';
 };
 
 export type UpdateChallenges = {
@@ -43,7 +43,7 @@ export type LobbyAction =
   | ConnectLobby
   | ConnectLobbySucceeded
   | ConnectLobbyFailed
-  | SendPing
+  | LobbyPing
   | UpdateChallenges
   | LoadGames
   | LoadGamesSucceeded
@@ -61,8 +61,8 @@ export function connectLobbyFailed(error: NetworkError): ConnectLobbyFailed {
   return { type: 'CONNECT_LOBBY_FAILED', error };
 }
 
-export function sendPing(): SendPing {
-  return { type: 'SEND_PING' };
+export function sendPing(): LobbyPing {
+  return { type: 'LOBBY_PING' };
 }
 
 export function updateChallenges(challenges: ReadonlyArray<Challenge>): UpdateChallenges {

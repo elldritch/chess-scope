@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 
 import { Action } from '../';
 import { fetch } from '../util/rpc';
+import { exhaustive } from '../util/types';
 
 import {
   LoadUser,
@@ -19,11 +20,12 @@ import {
   logoutFailed,
   LogoutSucceeded,
   logoutSucceeded,
+  UserAction,
 } from './actions';
 import { loginError, notLoggedInError, UserState } from './models';
 
 // Reducer.
-export function userReducer(state: UserState | undefined, action: Action): UserState {
+export function userReducer(state: UserState | undefined, action: UserAction): UserState {
   if (!state) {
     return { loading: false, data: null, error: null };
   }
@@ -51,7 +53,7 @@ export function userReducer(state: UserState | undefined, action: Action): UserS
       return { ...state, loading: false, error: action.error };
 
     default:
-      return state;
+      return exhaustive(action, state);
   }
 }
 

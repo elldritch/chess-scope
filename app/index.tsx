@@ -21,7 +21,7 @@ import TacScope from './TacScope';
 // Set up developer tools
 const DevTools = createDevTools(
   <DockMonitor toggleVisibilityKey="ctrl-i" changePositionKey="ctrl-p" changeMonitorKey="ctrl-m">
-    <FilterMonitor blacklist={['SEND_PING']}>
+    <FilterMonitor blacklist={['LOBBY_PING', 'GAME_PING']}>
       <Inspector />
     </FilterMonitor>
     <Inspector />

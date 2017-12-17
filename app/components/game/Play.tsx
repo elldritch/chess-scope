@@ -6,8 +6,10 @@ import { match, withRouter } from 'react-router-dom';
 
 import { NonIdealState, Spinner } from '@blueprintjs/core';
 
+import Chess = require('chess.js');
+
 import { State } from '../../state';
-import { Game, loadGame, LoadGame } from '../../state/game';
+import { Game, loadGame, LoadGame, SendMove, sendMove } from '../../state/game';
 import { Async } from '../../state/util/types';
 
 type PlayRouteProps = {
@@ -19,26 +21,47 @@ type PlayProps = {
   readonly location: Location;
   readonly history: History;
 
-  readonly game: Async<Game>;
+  readonly game: Async<Game | null>;
+  readonly board: string;
   readonly loadGame: (gameId: string) => LoadGame;
+  readonly sendMove: (from: string, to: string, promotion?: string) => SendMove;
 };
 
-// TODO: re-enable on completion
-// tslint:disable
 class Play extends React.Component<PlayProps> {
+  // tslint:disable:readonly-keyword
+  private board: ChessBoard;
+  private game: Chess;
+  // tslint:enable:readonly-keyword
+
   public componentDidMount() {
     this.props.loadGame(this.props.match.params.gameId);
   }
 
-  public componentDidUpdate() {
-    if (!this.props.game.loading && this.props.game.data) {
-      console.log(this.props.game.data);
-      const board = ChessBoard('chessboard', {
+  public componentDidUpdate(prevProps: PlayProps) {
+    if (!this.props.game.loading && prevProps.game.loading) {
+      this.board = ChessBoard('chessboard', {
         pieceTheme: piece => `/assets/pieces/${piece}.png`,
-        position: this.props.game.data.game.fen,
+        position: this.props.game.data!.game.fen,
+        draggable: true,
+        orientation: this.props.game.data!.player.color,
+        onDrop: (source, target) => {
+          if (
+            this.game
+              .moves({ square: source, verbose: true })
+              .filter(move => move.from === source && move.to === target).length > 0
+          ) {
+            this.props.sendMove(source, target);
+            return;
+          }
+          return 'snapback';
+        },
       });
+      this.game = new Chess(this.props.game.data!.game.fen);
+    }
 
-      console.log(board);
+    if (prevProps.board !== this.props.board) {
+      this.board.position(this.props.board);
+      this.game.load(this.props.board);
     }
   }
 
@@ -62,4 +85,6 @@ class Play extends React.Component<PlayProps> {
   }
 }
 
-export default connect((state: State) => ({ game: state.game.game }), { loadGame })(withRouter(Play));
+export default connect((state: State) => ({ game: state.game.game, board: state.game.board }), { loadGame, sendMove })(
+  withRouter(Play),
+);

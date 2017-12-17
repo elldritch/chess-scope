@@ -27,3 +27,7 @@ export type ServerError = Error<'SERVER_ERROR', 'Something went wrong on the ser
 export function serverError(details: {}): ServerError {
   return { error: 'SERVER_ERROR', reason: 'Something went wrong on the server.', details };
 }
+
+export function exhaustive(_: never, fallback: {}): never {
+  return fallback as never;
+}

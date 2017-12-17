@@ -1,12 +1,7 @@
 import { NetworkError } from '../util/types';
-import { Game } from './models';
+import { Crowd, Game, Move } from './models';
 
 // Actions.
-export type StartGame = {
-  readonly type: 'START_GAME';
-  readonly gameId: string;
-};
-
 export type LoadGame = {
   readonly type: 'LOAD_GAME';
   readonly gameId: string;
@@ -36,18 +31,46 @@ export type ConnectGameFailed = {
   readonly error: NetworkError;
 };
 
+export type GamePing = {
+  readonly type: 'GAME_PING';
+  readonly v: number;
+};
+
+export type UpdateCrowd = {
+  readonly type: 'UPDATE_CROWD';
+  readonly crowd: Crowd;
+};
+
+export type UpdateMove = {
+  readonly type: 'UPDATE_MOVE';
+  readonly v: number;
+  readonly move: Move;
+};
+
+export type UpdateVersion = {
+  readonly type: 'UPDATE_VERSION';
+  readonly v: number;
+};
+
+export type SendMove = {
+  readonly type: 'SEND_MOVE';
+  readonly from: string;
+  readonly to: string;
+  readonly promotion?: string;
+};
+
 export type GameAction =
-  | StartGame
   | LoadGame
   | LoadGameSucceeded
   | LoadGameFailed
   | ConnectGame
   | ConnectGameSucceeded
-  | ConnectGameFailed;
-
-export function startGame(gameId: string): StartGame {
-  return { type: 'START_GAME', gameId };
-}
+  | ConnectGameFailed
+  | GamePing
+  | UpdateCrowd
+  | UpdateMove
+  | UpdateVersion
+  | SendMove;
 
 export function loadGame(gameId: string): LoadGame {
   return { type: 'LOAD_GAME', gameId };
@@ -71,4 +94,24 @@ export function connectGameSucceeded(): ConnectGameSucceeded {
 
 export function connectGameFailed(error: NetworkError): ConnectGameFailed {
   return { type: 'CONNECT_GAME_FAILED', error };
+}
+
+export function gamePing(v: number): GamePing {
+  return { type: 'GAME_PING', v };
+}
+
+export function updateCrowd(crowd: Crowd): UpdateCrowd {
+  return { type: 'UPDATE_CROWD', crowd };
+}
+
+export function updateMove(v: number, move: Move): UpdateMove {
+  return { type: 'UPDATE_MOVE', v, move };
+}
+
+export function updateVersion(v: number): UpdateVersion {
+  return { type: 'UPDATE_VERSION', v };
+}
+
+export function sendMove(from: string, to: string, promotion?: string): SendMove {
+  return { type: 'SEND_MOVE', from, to, promotion };
 }

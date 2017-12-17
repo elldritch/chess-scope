@@ -135,6 +135,7 @@ export type LobbyServerMessage =
   | FollowingOnlines
   | Streams;
 
+// WebSocket request models.
 export type Ping = {
   readonly t: 'p';
   readonly v: number;

@@ -2,6 +2,8 @@ import { Action } from 'redux';
 
 import { Observable, Subject } from 'rxjs';
 
+import { Error } from './types';
+
 export type StatusMessage =
   | {
       readonly status: 'OPEN';
@@ -12,11 +14,15 @@ export type StatusMessage =
       readonly event: CloseEvent;
     };
 
+export type SendError =
+  | Error<'SOCKET_STILL_CONNECTING', 'Socket is not yet open.'>
+  | Error<'SOCKET_CLOSING', 'Socket is in the process of closing.'>;
+
 export type WrappedSocket<InMessage, OutMessage> = {
   readonly raw: WebSocket;
   readonly status: Observable<StatusMessage>;
   readonly messages: Observable<InMessage>;
-  readonly send: (message: OutMessage) => void;
+  readonly send: (message: OutMessage) => SendError | void;
   readonly close: (code?: number, reason?: string) => void;
 };
 
@@ -49,7 +55,12 @@ export function connect<InMessage, OutMessage>(url: string): WrappedSocket<InMes
     raw: socket,
     status: statusSubject.asObservable(),
     messages: messageSubject.asObservable(),
-    send: message => socket.send(JSON.stringify(message)),
+    send: message =>
+      socket.readyState === WebSocket.CONNECTING
+        ? { error: 'SOCKET_STILL_CONNECTING', reason: 'Socket is not yet open.', details: {} }
+        : socket.readyState === WebSocket.CLOSING
+          ? { error: 'SOCKET_CLOSING', reason: 'Socket is in the process of closing.', details: {} }
+          : socket.send(JSON.stringify(message)),
     close: (code?, reason?) => socket.close(code, reason),
   };
 }

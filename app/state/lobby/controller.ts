@@ -7,7 +7,9 @@ import { stringify } from 'qs';
 import { Action, State } from '../';
 import { fetch } from '../util/rpc';
 import { connect, makeEpic } from '../util/sockets';
-import { NetworkError } from '../util/types';
+import { exhaustive, NetworkError } from '../util/types';
+
+import { LogoutSucceeded } from '../user/index';
 
 import {
   connectLobbyFailed,
@@ -17,13 +19,14 @@ import {
   loadGamesFailed,
   LoadGamesSucceeded,
   loadGamesSucceeded,
+  LobbyAction,
   sendPing,
   updateChallenges,
 } from './actions';
 import { LobbyClientMessage, LobbyServerMessage, LobbyState } from './models';
 
 // Reducer.
-export function lobbyReducer(state: LobbyState | undefined, action: Action): LobbyState {
+export function lobbyReducer(state: LobbyState | undefined, action: LobbyAction | LogoutSucceeded): LobbyState {
   if (!state) {
     return {
       challenges: [],
@@ -62,8 +65,8 @@ export function lobbyReducer(state: LobbyState | undefined, action: Action): Lob
       }
       return { ...state, socket: { data: null, error: null, loading: false } };
 
-    case 'SEND_PING':
-      state.socket.data!.send({ t: 'p', v: 1 });
+    case 'LOBBY_PING':
+      state.socket.data!.send({ t: 'p', v: 0 });
       return state;
 
     case 'UPDATE_CHALLENGES':
@@ -79,7 +82,7 @@ export function lobbyReducer(state: LobbyState | undefined, action: Action): Lob
       return { ...state, games: { ...state.games, loading: false, error: action.error } };
 
     default:
-      return state;
+      return exhaustive(action, state);
   }
 }
 
@@ -116,7 +119,7 @@ export function lobbyEpic(action$: Observable<Action>, store: MiddlewareAPI<Stat
         default:
           // tslint:disable-next-line:no-console
           console.log(message);
-          return Observable.empty<Action>();
+          return exhaustive(message, Observable.empty<Action>());
       }
     },
     startSelector: action => action.type === 'CONNECT_LOBBY',

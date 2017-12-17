@@ -1,6 +1,7 @@
 import { WrappedSocket } from '../util/sockets';
 import { Async } from '../util/types';
 
+// API response models.
 export type Game = {
   readonly game: {
     readonly id: string;
@@ -26,7 +27,7 @@ export type Game = {
     readonly lastMove: string;
   };
   readonly player: {
-    readonly color: string;
+    readonly color: 'black' | 'white';
     readonly user: {
       readonly id: string;
       readonly username: string;
@@ -103,11 +104,70 @@ export type Game = {
   readonly chat: ReadonlyArray<any>;
 };
 
-export type GameServerMessage = {};
+// WebSocket response models.
+export type Crowd = {
+  readonly t: 'crowd';
+  readonly d: {
+    readonly white: boolean;
+    readonly black: boolean;
+    readonly watchers: number;
+  };
+};
 
-export type GameClientMessage = {};
+export type Pong = {
+  readonly t: 'n';
+};
+
+export type Move = {
+  readonly t: 'move';
+  readonly v: number;
+  readonly d: {
+    readonly dests: {
+      readonly [from: string]: string;
+    };
+    readonly fen: string;
+    readonly ply: number;
+    readonly san: string;
+    readonly uci: string;
+  };
+};
+
+export type Batch = {
+  readonly t: 'b';
+  readonly d: ReadonlyArray<Move>;
+};
+
+export type Ack = {
+  readonly t: 'ack';
+};
+
+export type GameServerMessage = Crowd | Pong | Move | Batch | Ack;
+
+// WebSocket request models.
+export type Ping = {
+  readonly t: 'p';
+  readonly v: number;
+};
+
+export type MakeMove = {
+  readonly t: 'move';
+  readonly d: {
+    readonly from: string;
+    readonly to: string;
+    readonly promotion?: string;
+  };
+};
+
+export type GameClientMessage = Ping | MakeMove;
 
 export type GameState = {
+  readonly crowd: Crowd | null;
+  readonly moves: {
+    readonly [version: number]: Move;
+  };
   readonly game: Async<Game | null>;
+
+  readonly board: string;
+  readonly v: number;
   readonly socket: Async<WrappedSocket<GameServerMessage, GameClientMessage> | null>;
 };
