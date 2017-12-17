@@ -1,5 +1,6 @@
 {
-  "name": "chess-tacscope",
+  "name": "chess-scope",
+  "version": "0.0.0-WIP",
   "private": true,
   "scripts": {
     "build": "npm run clean && mkdir dist tmp && npm run build:html && npm run build:js && npm run build:assets",
